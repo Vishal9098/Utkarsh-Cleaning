@@ -1,0 +1,48 @@
+{% extends 'cleaning_app/base.html' %}
+{% block title %}Login - Utkarsh Cleaning{% endblock %}
+{% block extra_css %}
+<style>
+.auth-page { min-height:80vh; display:flex; align-items:center; justify-content:center; padding:48px 2rem; background:linear-gradient(135deg,#f0f9ff,#e0f2fe); }
+.auth-card { background:white; border-radius:24px; padding:48px; width:100%; max-width:460px; box-shadow:0 20px 60px rgba(0,0,0,0.1); border:1px solid #e2e8f0; }
+.auth-logo { text-align:center; margin-bottom:32px; }
+.auth-logo .icon { font-size:3rem; }
+.auth-logo h2 { font-size:1.5rem; font-weight:800; color:var(--dark); margin:12px 0 4px; }
+.auth-logo p { color:var(--gray); font-size:0.9rem; }
+.form-group { margin-bottom:18px; }
+.form-group label { display:block; font-size:0.82rem; font-weight:700; color:var(--dark); margin-bottom:8px; text-transform:uppercase; letter-spacing:0.5px; }
+.form-group .form-control { width:100%; }
+.divider { text-align:center; color:var(--gray); font-size:0.85rem; margin:20px 0; position:relative; }
+.divider::before, .divider::after { content:''; position:absolute; top:50%; width:42%; height:1px; background:#e2e8f0; }
+.divider::before { left:0; } .divider::after { right:0; }
+</style>
+{% endblock %}
+{% block content %}
+<div class="auth-page">
+    <div class="auth-card">
+        <div class="auth-logo">
+            <div class="icon">🧹</div>
+            <h2>Wapas Swagat Hai!</h2>
+            <p>Apne account mein login karein</p>
+        </div>
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                <label>Username</label>
+                {{ form.username }}
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                {{ form.password }}
+            </div>
+            <button type="submit" class="btn-primary" style="width:100%;justify-content:center;font-size:1rem;padding:14px;margin-bottom:20px;">
+                <i class="fas fa-sign-in-alt"></i> Login Karein
+            </button>
+        </form>
+        <div class="divider">ya</div>
+        <div style="text-align:center;margin-top:20px;">
+            <span style="color:var(--gray);font-size:0.9rem;">Account nahi hai? </span>
+            <a href="{% url 'register' %}" style="color:var(--primary);font-weight:700;">Register Karein</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,373 @@
+{% extends 'cleaning_app/base.html' %}
+
+{% block title %}Utkarsh Cleaning Home Services - Ghar Ki Safai, Humari Zimmedari{% endblock %}
+
+{% block extra_css %}
+<style>
+/* HERO */
+.hero {
+    background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #1d4ed8 100%);
+    min-height: 90vh; display: flex; align-items: center;
+    position: relative; overflow: hidden; padding: 80px 2rem;
+}
+.hero::before {
+    content: ''; position: absolute; top: -50%; right: -20%;
+    width: 700px; height: 700px;
+    background: radial-gradient(circle, rgba(0,198,160,0.15) 0%, transparent 70%);
+    border-radius: 50%;
+}
+.hero::after {
+    content: ''; position: absolute; bottom: -30%; left: -10%;
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(245,158,11,0.1) 0%, transparent 70%);
+    border-radius: 50%;
+}
+.hero-container {
+    max-width: 1200px; margin: 0 auto; width: 100%;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center;
+    position: relative; z-index: 1;
+}
+.hero-content .badge-hero {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(0,198,160,0.15); border: 1px solid rgba(0,198,160,0.3);
+    color: var(--secondary); padding: 8px 18px; border-radius: 100px;
+    font-size: 0.82rem; font-weight: 600; margin-bottom: 24px;
+}
+.hero-content h1 {
+    font-family: 'Playfair Display', serif; font-size: 3.5rem; color: white;
+    line-height: 1.15; margin-bottom: 24px;
+}
+.hero-content h1 span { color: var(--secondary); }
+.hero-content p {
+    color: #94a3b8; font-size: 1.05rem; line-height: 1.8; margin-bottom: 40px;
+}
+.hero-actions { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 48px; }
+.hero-stats {
+    display: flex; gap: 32px; padding-top: 32px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+}
+.stat-item { text-align: center; }
+.stat-item .num { font-size: 2rem; font-weight: 800; color: white; }
+.stat-item .label { color: #94a3b8; font-size: 0.8rem; }
+.hero-visual {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+}
+.hero-card {
+    background: rgba(255,255,255,0.08); backdrop-filter: blur(16px);
+    border: 1px solid rgba(255,255,255,0.12); border-radius: 20px;
+    padding: 24px; text-align: center; transition: all 0.3s;
+}
+.hero-card:hover { background: rgba(255,255,255,0.15); transform: translateY(-4px); }
+.hero-card .icon { font-size: 2.5rem; margin-bottom: 12px; }
+.hero-card h4 { color: white; font-size: 0.95rem; font-weight: 600; margin-bottom: 6px; }
+.hero-card p { color: #94a3b8; font-size: 0.8rem; }
+.hero-card.large { grid-column: 1 / -1; }
+
+/* FEATURES */
+.features { padding: 80px 2rem; background: white; }
+.features-container { max-width: 1200px; margin: 0 auto; }
+.features-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 32px; margin-top: 16px; }
+.feature-card {
+    text-align: center; padding: 32px 24px; border-radius: var(--radius);
+    border: 1px solid #e2e8f0; transition: all 0.3s;
+}
+.feature-card:hover { border-color: var(--primary); box-shadow: var(--shadow); transform: translateY(-4px); }
+.feature-icon {
+    width: 64px; height: 64px; background: linear-gradient(135deg, rgba(26,86,219,0.1), rgba(0,198,160,0.1));
+    border-radius: 16px; display: flex; align-items: center; justify-content: center;
+    font-size: 1.8rem; margin: 0 auto 20px;
+}
+.feature-card h3 { font-size: 1rem; font-weight: 700; margin-bottom: 10px; }
+.feature-card p { color: var(--gray); font-size: 0.85rem; line-height: 1.6; }
+
+/* SERVICES SECTION */
+.services-section { padding: 80px 2rem; }
+.services-container { max-width: 1200px; margin: 0 auto; }
+.services-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; }
+
+/* CATEGORIES */
+.categories-section { padding: 80px 2rem; background: white; }
+.categories-container { max-width: 1200px; margin: 0 auto; }
+.categories-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 20px; }
+.category-card {
+    text-align: center; padding: 28px 16px; border-radius: var(--radius);
+    background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+    border: 1px solid #bae6fd; cursor: pointer; transition: all 0.3s;
+}
+.category-card:hover { transform: translateY(-4px); background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; }
+.category-card:hover .cat-icon { color: white; }
+.category-card:hover p { color: rgba(255,255,255,0.8); }
+.cat-icon { font-size: 2.2rem; color: var(--primary); margin-bottom: 12px; }
+.category-card h4 { font-size: 0.85rem; font-weight: 600; margin-bottom: 4px; }
+.category-card p { font-size: 0.75rem; color: var(--gray); }
+
+/* TESTIMONIALS */
+.testimonials-section { padding: 80px 2rem; background: linear-gradient(135deg, #f0f9ff, #e0f2fe); }
+.testimonials-container { max-width: 1200px; margin: 0 auto; }
+.testimonials-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; }
+.testimonial-card {
+    background: white; border-radius: var(--radius); padding: 32px;
+    box-shadow: var(--shadow); border: 1px solid #e2e8f0;
+}
+.testimonial-stars { color: var(--accent); margin-bottom: 16px; }
+.testimonial-card p { color: var(--gray); font-size: 0.9rem; line-height: 1.7; margin-bottom: 20px; font-style: italic; }
+.testimonial-author { display: flex; align-items: center; gap: 12px; }
+.author-avatar {
+    width: 48px; height: 48px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 1.1rem;
+}
+.author-info h5 { font-weight: 700; font-size: 0.9rem; }
+.author-info span { color: var(--gray); font-size: 0.8rem; }
+
+/* CTA */
+.cta-section {
+    padding: 80px 2rem;
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    text-align: center;
+}
+.cta-section h2 { font-family: 'Playfair Display', serif; font-size: 2.5rem; color: white; margin-bottom: 16px; }
+.cta-section p { color: rgba(255,255,255,0.8); font-size: 1rem; margin-bottom: 40px; }
+.cta-actions { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+.btn-white {
+    background: white; color: var(--primary); border: none; border-radius: 12px;
+    padding: 14px 32px; font-size: 1rem; font-weight: 700; cursor: pointer;
+    transition: all 0.2s; display: inline-flex; align-items: center; gap: 8px;
+}
+.btn-white:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.2); }
+
+@media (max-width: 1024px) {
+    .hero-container { grid-template-columns: 1fr; }
+    .hero-visual { display: none; }
+    .features-grid { grid-template-columns: repeat(2,1fr); }
+    .services-grid { grid-template-columns: repeat(2,1fr); }
+    .categories-grid { grid-template-columns: repeat(3,1fr); }
+    .testimonials-grid { grid-template-columns: repeat(2,1fr); }
+}
+@media (max-width: 640px) {
+    .hero-content h1 { font-size: 2.2rem; }
+    .hero-stats { gap: 20px; }
+    .features-grid, .services-grid, .testimonials-grid { grid-template-columns: 1fr; }
+    .categories-grid { grid-template-columns: repeat(2,1fr); }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- HERO -->
+<section class="hero">
+    <div class="hero-container">
+        <div class="hero-content">
+            <div class="badge-hero">
+                <i class="fas fa-shield-alt"></i> 100% Trusted & Verified
+            </div>
+            <h1>Ghar Ki Safai, <span>Humari Zimmedari</span></h1>
+            <p>Professional cleaning services ghar baithe book karein. Trained staff, quality products aur guaranteed satisfaction ke saath.</p>
+            <div class="hero-actions">
+                <a href="{% url 'services' %}" class="btn-primary" style="font-size:1rem;padding:16px 32px;">
+                    <i class="fas fa-search"></i> Services Dekhein
+                </a>
+                <a href="tel:9876543210" class="btn-secondary" style="font-size:1rem;padding:16px 32px;">
+                    <i class="fas fa-phone"></i> Call Karein
+                </a>
+            </div>
+            <div class="hero-stats">
+                <div class="stat-item"><div class="num">5000+</div><div class="label">Happy Customers</div></div>
+                <div class="stat-item"><div class="num">98%</div><div class="label">Satisfaction Rate</div></div>
+                <div class="stat-item"><div class="num">50+</div><div class="label">Expert Staff</div></div>
+                <div class="stat-item"><div class="num">6+</div><div class="label">Years of Trust</div></div>
+            </div>
+        </div>
+        <div class="hero-visual">
+            <div class="hero-card large">
+                <div class="icon">🏠</div>
+                <h4>Complete Home Cleaning</h4>
+                <p>Har corner aur har room ki thorough cleaning</p>
+            </div>
+            <div class="hero-card">
+                <div class="icon">✨</div>
+                <h4>Deep Cleaning</h4>
+                <p>Professional grade</p>
+            </div>
+            <div class="hero-card">
+                <div class="icon">🛡️</div>
+                <h4>Safe Products</h4>
+                <p>Eco-friendly chemicals</p>
+            </div>
+            <div class="hero-card">
+                <div class="icon">⭐</div>
+                <h4>4.9/5 Rating</h4>
+                <p>5000+ reviews</p>
+            </div>
+            <div class="hero-card">
+                <div class="icon">⚡</div>
+                <h4>Same Day</h4>
+                <p>Quick booking</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FEATURES -->
+<section class="features">
+    <div class="features-container">
+        <div class="section-header">
+            <div class="badge">Kyun Choose Karein Hume?</div>
+            <h2>Humari Khubiyaan</h2>
+            <p>Hum sirf cleaning nahi karte, ek experience dete hain jo aapko baar baar wapas laaye</p>
+        </div>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">🎓</div>
+                <h3>Trained Professionals</h3>
+                <p>Hamare sabhi cleaners professionally trained hain aur background verified hain</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🌿</div>
+                <h3>Eco-Friendly Products</h3>
+                <p>Hum sirf safe aur environment-friendly cleaning products use karte hain</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">💯</div>
+                <h3>Satisfaction Guarantee</h3>
+                <p>Agar aap santusht nahi hain to hum free mein dobara cleaning karenge</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📱</div>
+                <h3>Easy Online Booking</h3>
+                <p>Ghar baithe apna schedule choose karein aur service book karein</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CATEGORIES -->
+{% if categories %}
+<section class="categories-section">
+    <div class="categories-container">
+        <div class="section-header">
+            <div class="badge">Hamare Services</div>
+            <h2>Service Categories</h2>
+            <p>Ghar ke har hisse ki cleaning ke liye hum tayyar hain</p>
+        </div>
+        <div class="categories-grid">
+            {% for category in categories %}
+            <a href="{% url 'services' %}?category={{ category.slug }}" class="category-card">
+                <div class="cat-icon"><i class="{{ category.icon }}"></i></div>
+                <h4>{{ category.name }}</h4>
+                <p>{{ category.services.count }} services</p>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- FEATURED SERVICES -->
+{% if featured_services %}
+<section class="services-section">
+    <div class="services-container">
+        <div class="section-header">
+            <div class="badge">Popular Services</div>
+            <h2>Featured Services</h2>
+            <p>Hamare sabse popular aur highly-rated services</p>
+        </div>
+        <div class="services-grid">
+            {% for service in featured_services %}
+            <div class="service-card">
+                <div class="service-card-img">
+                    {% if service.image %}
+                    <img src="{{ service.image.url }}" alt="{{ service.name }}">
+                    {% else %}
+                    <div class="placeholder-icon">🧹</div>
+                    {% endif %}
+                    {% if service.get_discount_percentage > 0 %}
+                    <span class="service-badge">{{ service.get_discount_percentage }}% OFF</span>
+                    {% endif %}
+                </div>
+                <div class="service-card-body">
+                    <h3>{{ service.name }}</h3>
+                    <p>{{ service.short_description }}</p>
+                    <div class="service-meta">
+                        <div class="service-rating">
+                            <i class="fas fa-star"></i> {{ service.rating }} ({{ service.review_count }} reviews)
+                        </div>
+                        <div class="service-duration"><i class="fas fa-clock"></i> {{ service.get_duration_display }}</div>
+                    </div>
+                    <div class="service-price">
+                        <span class="price-current">₹{{ service.get_final_price }}</span>
+                        {% if service.discounted_price %}
+                        <span class="price-original">₹{{ service.price }}</span>
+                        <span class="price-discount">{{ service.get_discount_percentage }}% off</span>
+                        {% endif %}
+                    </div>
+                    <div class="service-actions">
+                        <a href="{% url 'service_detail' service.slug %}" class="btn-outline">Details</a>
+                        <form method="post" action="{% url 'add_to_cart' service.id %}" style="flex:1">
+                            {% csrf_token %}
+                            <button type="submit" class="btn-primary" style="width:100%;justify-content:center;">
+                                <i class="fas fa-cart-plus"></i> Add to Cart
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <div style="text-align:center;margin-top:48px;">
+            <a href="{% url 'services' %}" class="btn-primary" style="font-size:1rem;padding:16px 40px;">
+                Sab Services Dekhein <i class="fas fa-arrow-right"></i>
+            </a>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- TESTIMONIALS -->
+{% if testimonials %}
+<section class="testimonials-section">
+    <div class="testimonials-container">
+        <div class="section-header">
+            <div class="badge">Customer Reviews</div>
+            <h2>Hamare Khush Customers</h2>
+            <p>Hazaaron satisfied customers ki genuine reviews</p>
+        </div>
+        <div class="testimonials-grid">
+            {% for t in testimonials %}
+            <div class="testimonial-card">
+                <div class="testimonial-stars">
+                    {% for i in "12345" %}
+                    {% if forloop.counter <= t.rating %}<i class="fas fa-star"></i>{% else %}<i class="far fa-star"></i>{% endif %}
+                    {% endfor %}
+                </div>
+                <p>"{{ t.comment }}"</p>
+                <div class="testimonial-author">
+                    <div class="author-avatar">{{ t.name|first }}</div>
+                    <div class="author-info">
+                        <h5>{{ t.name }}</h5>
+                        <span><i class="fas fa-map-marker-alt"></i> {{ t.location }}</span>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- CTA -->
+<section class="cta-section">
+    <h2>Aaj Hi Book Karein!</h2>
+    <p>Pehli cleaning par 20% discount paaiye. Limited time offer!</p>
+    <div class="cta-actions">
+        <a href="{% url 'services' %}" class="btn-white">
+            <i class="fas fa-calendar-check"></i> Abhi Book Karein
+        </a>
+        <a href="tel:9876543210" style="background:transparent;border:2px solid rgba(255,255,255,0.4);color:white;border-radius:12px;padding:14px 32px;font-size:1rem;font-weight:600;display:inline-flex;align-items:center;gap:8px;">
+            <i class="fas fa-phone"></i> +91 98765 43210
+        </a>
+    </div>
+</section>
+
+{% endblock %}

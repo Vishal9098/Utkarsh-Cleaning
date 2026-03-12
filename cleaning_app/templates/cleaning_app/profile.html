@@ -1,0 +1,59 @@
+{% extends 'cleaning_app/base.html' %}
+{% block title %}My Profile - Utkarsh Cleaning{% endblock %}
+{% block content %}
+<div style="max-width:900px;margin:48px auto;padding:0 2rem;">
+    <h1 style="font-size:1.8rem;font-weight:800;margin-bottom:32px;">👤 Meri Profile</h1>
+    <div style="display:grid;grid-template-columns:1fr 2fr;gap:32px;">
+        <div>
+            <div style="background:white;border-radius:var(--radius);padding:28px;box-shadow:var(--shadow);border:1px solid #e2e8f0;text-align:center;margin-bottom:20px;">
+                <div style="width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,#1a56db,#00c6a0);display:flex;align-items:center;justify-content:center;color:white;font-size:2rem;font-weight:700;margin:0 auto 16px;">{{ user.username|first|upper }}</div>
+                <h3 style="font-size:1.1rem;font-weight:700;">{{ user.get_full_name|default:user.username }}</h3>
+                <p style="color:#64748b;font-size:0.85rem;">{{ user.email }}</p>
+                <p style="color:#64748b;font-size:0.8rem;margin-top:8px;">Member since {{ user.date_joined|date:"M Y" }}</p>
+            </div>
+            <div style="background:white;border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);border:1px solid #e2e8f0;">
+                <h4 style="font-size:0.9rem;font-weight:700;margin-bottom:16px;">Quick Links</h4>
+                <a href="{% url 'my_orders' %}" style="display:flex;align-items:center;gap:10px;padding:10px 0;color:#64748b;font-size:0.88rem;border-bottom:1px solid #f1f5f9;"><i class="fas fa-box" style="color:#1a56db;width:16px;"></i> My Orders</a>
+                <a href="{% url 'cart' %}" style="display:flex;align-items:center;gap:10px;padding:10px 0;color:#64748b;font-size:0.88rem;border-bottom:1px solid #f1f5f9;"><i class="fas fa-shopping-cart" style="color:#1a56db;width:16px;"></i> My Cart</a>
+                <a href="{% url 'logout' %}" style="display:flex;align-items:center;gap:10px;padding:10px 0;color:#ef4444;font-size:0.88rem;"><i class="fas fa-sign-out-alt" style="width:16px;"></i> Logout</a>
+            </div>
+        </div>
+        <div>
+            <div style="background:white;border-radius:var(--radius);padding:32px;box-shadow:var(--shadow);border:1px solid #e2e8f0;margin-bottom:24px;">
+                <h2 style="font-size:1.1rem;font-weight:700;margin-bottom:24px;padding-bottom:14px;border-bottom:2px solid #f1f5f9;">Profile Update Karein</h2>
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+                        <div><label style="display:block;font-size:0.82rem;font-weight:700;margin-bottom:6px;">First Name</label><input type="text" name="first_name" value="{{ user.first_name }}" class="form-control" style="width:100%;padding:10px 14px;border:2px solid #e2e8f0;border-radius:10px;font-family:inherit;font-size:0.9rem;outline:none;"></div>
+                        <div><label style="display:block;font-size:0.82rem;font-weight:700;margin-bottom:6px;">Last Name</label><input type="text" name="last_name" value="{{ user.last_name }}" class="form-control" style="width:100%;padding:10px 14px;border:2px solid #e2e8f0;border-radius:10px;font-family:inherit;font-size:0.9rem;outline:none;"></div>
+                    </div>
+                    <div style="margin-bottom:16px;"><label style="display:block;font-size:0.82rem;font-weight:700;margin-bottom:6px;">Email</label><input type="email" name="email" value="{{ user.email }}" style="width:100%;padding:10px 14px;border:2px solid #e2e8f0;border-radius:10px;font-family:inherit;font-size:0.9rem;outline:none;"></div>
+                    {% for field in form %}
+                    {% if field.name != 'avatar' %}
+                    <div style="margin-bottom:16px;"><label style="display:block;font-size:0.82rem;font-weight:700;margin-bottom:6px;">{{ field.label }}</label>{{ field }}</div>
+                    {% endif %}
+                    {% endfor %}
+                    <button type="submit" class="btn-primary" style="padding:12px 28px;">Profile Update Karein</button>
+                </form>
+            </div>
+
+            {% if recent_orders %}
+            <div style="background:white;border-radius:var(--radius);padding:28px;box-shadow:var(--shadow);border:1px solid #e2e8f0;">
+                <h2 style="font-size:1.1rem;font-weight:700;margin-bottom:20px;">Recent Orders</h2>
+                {% for order in recent_orders %}
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid #f1f5f9;font-size:0.88rem;">
+                    <div>
+                        <div style="font-family:monospace;font-weight:700;color:#1a56db;">#{{ order.order_id|stringformat:"s"|slice:":8"|upper }}</div>
+                        <div style="color:#64748b;font-size:0.78rem;">{{ order.created_at|date:"d M Y" }}</div>
+                    </div>
+                    <span style="padding:4px 12px;border-radius:100px;font-size:0.72rem;font-weight:700;background:{% if order.status == 'completed' %}#d1fae5;color:#065f46{% elif order.status == 'cancelled' %}#fee2e2;color:#991b1b{% else %}#dbeafe;color:#1e40af{% endif %}">{{ order.get_status_display }}</span>
+                    <strong>₹{{ order.total }}</strong>
+                </div>
+                {% endfor %}
+                <a href="{% url 'my_orders' %}" style="display:inline-block;margin-top:16px;color:#1a56db;font-size:0.85rem;font-weight:600;">Sab orders dekhein →</a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

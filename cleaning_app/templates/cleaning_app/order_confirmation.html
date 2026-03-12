@@ -1,0 +1,43 @@
+{% extends 'cleaning_app/base.html' %}
+{% block title %}Order Confirmed! - Utkarsh Cleaning{% endblock %}
+{% block content %}
+<div style="max-width:700px;margin:80px auto;padding:0 2rem;text-align:center;">
+    <div style="background:white;border-radius:24px;padding:60px 48px;box-shadow:0 20px 60px rgba(0,0,0,0.1);border:1px solid #e2e8f0;">
+        <div style="width:80px;height:80px;background:linear-gradient(135deg,#10b981,#059669);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 24px;font-size:2rem;">✅</div>
+        <h1 style="font-size:2rem;font-weight:800;color:#065f46;margin-bottom:12px;">Order Confirmed!</h1>
+        <p style="color:#64748b;margin-bottom:32px;font-size:1rem;line-height:1.7;">Aapka order successfully place ho gaya hai. Hamari team jald hi aapse contact karegi.</p>
+        
+        <div style="background:linear-gradient(135deg,#f0fdf4,#dcfce7);border-radius:16px;padding:24px;margin-bottom:32px;border:1px solid #bbf7d0;">
+            <div style="font-size:0.85rem;color:#64748b;margin-bottom:8px;">Order ID</div>
+            <div style="font-size:1.3rem;font-weight:800;color:#059669;font-family:monospace;">#{{ order.order_id|stringformat:"s"|slice:":8"|upper }}</div>
+        </div>
+
+        <div style="text-align:left;background:#f8fafc;border-radius:16px;padding:24px;margin-bottom:32px;">
+            <h3 style="font-size:1rem;font-weight:700;margin-bottom:16px;">Order Details</h3>
+            {% for item in order.items.all %}
+            <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #e2e8f0;font-size:0.9rem;">
+                <span>{{ item.service_name }} × {{ item.quantity }}</span>
+                <strong>₹{{ item.get_subtotal }}</strong>
+            </div>
+            {% endfor %}
+            <div style="display:flex;justify-content:space-between;padding:14px 0 0;font-size:1rem;font-weight:800;color:#1a56db;">
+                <span>Total</span><span>₹{{ order.total }}</span>
+            </div>
+        </div>
+
+        <div style="background:#eff6ff;border-radius:12px;padding:20px;margin-bottom:32px;text-align:left;">
+            <h4 style="font-size:0.9rem;font-weight:700;margin-bottom:12px;">📅 Service Schedule</h4>
+            <p style="font-size:0.88rem;color:#64748b;">
+                <strong>Date:</strong> {{ order.service_date|date:"d F Y" }}<br>
+                <strong>Time:</strong> {{ order.service_time|time:"H:i" }}<br>
+                <strong>Address:</strong> {{ order.address_line1 }}, {{ order.city }}
+            </p>
+        </div>
+
+        <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;">
+            <a href="{% url 'my_orders' %}" class="btn-primary" style="padding:14px 28px;">My Orders Dekhein</a>
+            <a href="{% url 'home' %}" class="btn-outline" style="padding:14px 28px;">Home Par Jaayein</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

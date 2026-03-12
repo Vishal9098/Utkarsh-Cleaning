@@ -1,0 +1,165 @@
+{% extends 'cleaning_app/base.html' %}
+{% block title %}Checkout - Utkarsh Cleaning{% endblock %}
+{% block extra_css %}
+<style>
+.checkout-page { max-width:1200px; margin:48px auto; padding:0 2rem; display:grid; grid-template-columns:1fr 400px; gap:48px; }
+.checkout-form-card { background:white; border-radius:var(--radius); padding:32px; box-shadow:var(--shadow); border:1px solid #e2e8f0; margin-bottom:28px; }
+.checkout-form-card h2 { font-size:1.1rem; font-weight:700; margin-bottom:24px; padding-bottom:14px; border-bottom:2px solid #f1f5f9; display:flex; align-items:center; gap:10px; }
+.form-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+.form-group { margin-bottom:16px; }
+.form-group label { display:block; font-size:0.82rem; font-weight:600; color:var(--dark); margin-bottom:6px; }
+.form-full { grid-column:1/-1; }
+.payment-options { display:flex; flex-direction:column; gap:12px; }
+.payment-option { display:flex; align-items:center; gap:14px; padding:16px; border:2px solid #e2e8f0; border-radius:12px; cursor:pointer; transition:all 0.2s; }
+.payment-option:hover { border-color:var(--primary); }
+.payment-option input:checked + label { color:var(--primary); }
+.payment-option.selected { border-color:var(--primary); background:rgba(26,86,219,0.04); }
+.order-summary-box { background:white; border-radius:var(--radius); padding:28px; box-shadow:var(--shadow); border:1px solid #e2e8f0; position:sticky; top:90px; height:fit-content; }
+.order-summary-box h3 { font-size:1.1rem; font-weight:700; margin-bottom:20px; padding-bottom:14px; border-bottom:2px solid #f1f5f9; }
+.order-item-row { display:flex; align-items:center; gap:12px; margin-bottom:14px; padding-bottom:14px; border-bottom:1px solid #f1f5f9; }
+.order-item-img { width:48px; height:48px; background:#f0f9ff; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:1.4rem; }
+.order-item-name { font-size:0.88rem; font-weight:600; }
+.order-item-qty { font-size:0.78rem; color:var(--gray); }
+.order-item-price { margin-left:auto; font-weight:700; color:var(--primary); font-size:0.9rem; }
+.summary-divider { height:1px; background:#f1f5f9; margin:16px 0; }
+.summary-row { display:flex; justify-content:space-between; font-size:0.9rem; margin-bottom:12px; }
+.summary-row span:first-child { color:var(--gray); }
+.summary-total { display:flex; justify-content:space-between; font-size:1.2rem; font-weight:800; color:var(--primary); padding-top:14px; border-top:2px solid #f1f5f9; }
+@media(max-width:1024px) { .checkout-page{grid-template-columns:1fr;} }
+@media(max-width:640px) { .form-grid{grid-template-columns:1fr;} }
+</style>
+{% endblock %}
+{% block content %}
+<div style="max-width:1200px;margin:32px auto;padding:0 2rem;">
+    <h1 style="font-size:1.8rem;font-weight:800;">🔒 Checkout</h1>
+</div>
+<form method="post">
+{% csrf_token %}
+<div class="checkout-page">
+    <div>
+        <!-- Personal Info -->
+        <div class="checkout-form-card">
+            <h2><i class="fas fa-user" style="color:var(--primary)"></i> Personal Information</h2>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Full Name *</label>
+                    {{ form.customer_name }}
+                </div>
+                <div class="form-group">
+                    <label>Phone Number *</label>
+                    {{ form.customer_phone }}
+                </div>
+                <div class="form-group form-full">
+                    <label>Email *</label>
+                    {{ form.customer_email }}
+                </div>
+            </div>
+        </div>
+
+        <!-- Address -->
+        <div class="checkout-form-card">
+            <h2><i class="fas fa-map-marker-alt" style="color:var(--primary)"></i> Service Address</h2>
+            <div class="form-grid">
+                <div class="form-group form-full">
+                    <label>Address Line 1 *</label>
+                    {{ form.address_line1 }}
+                </div>
+                <div class="form-group form-full">
+                    <label>Address Line 2</label>
+                    {{ form.address_line2 }}
+                </div>
+                <div class="form-group">
+                    <label>City *</label>
+                    {{ form.city }}
+                </div>
+                <div class="form-group">
+                    <label>State</label>
+                    {{ form.state }}
+                </div>
+                <div class="form-group">
+                    <label>Pincode *</label>
+                    {{ form.pincode }}
+                </div>
+            </div>
+        </div>
+
+        <!-- Schedule -->
+        <div class="checkout-form-card">
+            <h2><i class="fas fa-calendar" style="color:var(--primary)"></i> Service Schedule</h2>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Service Date *</label>
+                    {{ form.service_date }}
+                </div>
+                <div class="form-group">
+                    <label>Service Time *</label>
+                    {{ form.service_time }}
+                </div>
+                <div class="form-group form-full">
+                    <label>Special Instructions</label>
+                    {{ form.special_instructions }}
+                </div>
+            </div>
+        </div>
+
+        <!-- Payment -->
+        <div class="checkout-form-card">
+            <h2><i class="fas fa-credit-card" style="color:var(--primary)"></i> Payment Method</h2>
+            <div class="payment-options">
+                <label class="payment-option">
+                    <input type="radio" name="payment_method" value="cod" checked class="form-check-input">
+                    <span style="font-size:1.5rem">💵</span>
+                    <div>
+                        <div style="font-weight:600">Cash on Delivery</div>
+                        <div style="font-size:0.8rem;color:var(--gray)">Service ke baad payment karein</div>
+                    </div>
+                </label>
+                <label class="payment-option">
+                    <input type="radio" name="payment_method" value="upi" class="form-check-input">
+                    <span style="font-size:1.5rem">📱</span>
+                    <div>
+                        <div style="font-weight:600">UPI Payment</div>
+                        <div style="font-size:0.8rem;color:var(--gray)">PhonePe, GPay, Paytm</div>
+                    </div>
+                </label>
+                <label class="payment-option">
+                    <input type="radio" name="payment_method" value="online" class="form-check-input">
+                    <span style="font-size:1.5rem">💳</span>
+                    <div>
+                        <div style="font-weight:600">Credit/Debit Card</div>
+                        <div style="font-size:0.8rem;color:var(--gray)">Secure online payment</div>
+                    </div>
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <!-- Order Summary -->
+    <div class="order-summary-box">
+        <h3>Order Summary</h3>
+        {% for item in cart_items %}
+        <div class="order-item-row">
+            <div class="order-item-img">{% if item.service.image %}<img src="{{ item.service.image.url }}" style="width:100%;height:100%;object-fit:cover;border-radius:8px;">{% else %}🧹{% endif %}</div>
+            <div>
+                <div class="order-item-name">{{ item.service.name }}</div>
+                <div class="order-item-qty">× {{ item.quantity }}</div>
+            </div>
+            <div class="order-item-price">₹{{ item.get_subtotal }}</div>
+        </div>
+        {% endfor %}
+
+        <div class="summary-row"><span>Subtotal</span><span>₹{{ subtotal }}</span></div>
+        {% if discount > 0 %}<div class="summary-row" style="color:#10b981;"><span>Discount</span><span>-₹{{ discount|floatformat:"0" }}</span></div>{% endif %}
+        <div class="summary-row"><span>GST (18%)</span><span>₹{{ tax }}</span></div>
+        <div class="summary-total"><span>Total</span><span>₹{{ total }}</span></div>
+
+        <button type="submit" class="btn-primary" style="width:100%;justify-content:center;font-size:1rem;padding:16px;margin-top:24px;">
+            <i class="fas fa-check-circle"></i> Order Place Karein
+        </button>
+        <div style="margin-top:16px;text-align:center;font-size:0.8rem;color:var(--gray);">
+            <i class="fas fa-shield-alt" style="color:var(--secondary)"></i> 100% Secure & Encrypted
+        </div>
+    </div>
+</div>
+</form>
+{% endblock %}

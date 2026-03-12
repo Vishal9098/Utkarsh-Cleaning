@@ -1,0 +1,121 @@
+{% extends 'cleaning_app/base.html' %}
+{% block title %}All Services - Utkarsh Cleaning{% endblock %}
+{% block extra_css %}
+<style>
+.page-header {
+    background: linear-gradient(135deg, #0f172a, #1e3a8a);
+    padding: 60px 2rem; text-align: center;
+}
+.page-header h1 { font-family:'Playfair Display',serif; font-size:2.5rem; color:white; margin-bottom:10px; }
+.page-header p { color:#94a3b8; font-size:1rem; }
+.services-page { max-width:1200px; margin:0 auto; padding:48px 2rem; display:grid; grid-template-columns:280px 1fr; gap:40px; }
+.sidebar { position:sticky; top:90px; height:fit-content; }
+.filter-card { background:white; border-radius:var(--radius); padding:28px; box-shadow:var(--shadow); margin-bottom:24px; border:1px solid #e2e8f0; }
+.filter-card h3 { font-size:1rem; font-weight:700; margin-bottom:20px; color:var(--dark); padding-bottom:12px; border-bottom:2px solid #f1f5f9; }
+.filter-card ul { list-style:none; }
+.filter-card ul li a { display:flex; align-items:center; justify-content:space-between; padding:10px 0; color:var(--gray); font-size:0.88rem; border-bottom:1px solid #f1f5f9; transition:color 0.2s; }
+.filter-card ul li a:hover, .filter-card ul li a.active { color:var(--primary); font-weight:600; }
+.search-form { position:relative; margin-bottom:20px; }
+.search-form input {
+    width:100%; padding:12px 48px 12px 16px; border:2px solid #e2e8f0; border-radius:12px;
+    font-size:0.9rem; font-family:inherit; outline:none; transition:border-color 0.2s;
+}
+.search-form input:focus { border-color:var(--primary); }
+.search-form button { position:absolute; right:12px; top:50%; transform:translateY(-50%); background:none; border:none; color:var(--gray); cursor:pointer; }
+.sort-select { width:100%; padding:10px; border:2px solid #e2e8f0; border-radius:10px; font-family:inherit; font-size:0.88rem; outline:none; cursor:pointer; }
+.services-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:24px; }
+.results-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:24px; }
+.results-header h2 { font-size:1.2rem; font-weight:700; }
+.results-header span { color:var(--gray); font-size:0.88rem; }
+.no-results { grid-column:1/-1; text-align:center; padding:80px 0; color:var(--gray); }
+.no-results i { font-size:3rem; margin-bottom:16px; display:block; opacity:0.3; }
+@media(max-width:1024px) { .services-page{grid-template-columns:1fr;} .sidebar{position:static;} .services-grid{grid-template-columns:repeat(2,1fr);} }
+@media(max-width:600px) { .services-grid{grid-template-columns:1fr;} }
+</style>
+{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h1>Hamare Services</h1>
+    <p>Professional cleaning services for every need</p>
+</div>
+<div class="services-page">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="filter-card">
+            <h3><i class="fas fa-search"></i> Search</h3>
+            <form method="get" class="search-form">
+                {% if selected_category %}<input type="hidden" name="category" value="{{ selected_category }}">{% endif %}
+                <input type="text" name="q" value="{{ search_query|default:'' }}" placeholder="Service dhundein...">
+                <button type="submit"><i class="fas fa-search"></i></button>
+            </form>
+        </div>
+        <div class="filter-card">
+            <h3><i class="fas fa-sort-amount-down"></i> Sort By</h3>
+            <form method="get">
+                {% if selected_category %}<input type="hidden" name="category" value="{{ selected_category }}">{% endif %}
+                {% if search_query %}<input type="hidden" name="q" value="{{ search_query }}">{% endif %}
+                <select name="sort" class="sort-select" onchange="this.form.submit()">
+                    <option value="default" {% if sort_by == 'default' %}selected{% endif %}>Default</option>
+                    <option value="price_low" {% if sort_by == 'price_low' %}selected{% endif %}>Price: Low to High</option>
+                    <option value="price_high" {% if sort_by == 'price_high' %}selected{% endif %}>Price: High to Low</option>
+                    <option value="rating" {% if sort_by == 'rating' %}selected{% endif %}>Rating</option>
+                </select>
+            </form>
+        </div>
+        <div class="filter-card">
+            <h3><i class="fas fa-th-large"></i> Categories</h3>
+            <ul>
+                <li><a href="{% url 'services' %}" class="{% if not selected_category %}active{% endif %}">All Services <span>{{ services.count }}</span></a></li>
+                {% for cat in categories %}
+                <li><a href="?category={{ cat.slug }}" class="{% if selected_category == cat.slug %}active{% endif %}">{{ cat.name }} <span>{{ cat.services.count }}</span></a></li>
+                {% endfor %}
+            </ul>
+        </div>
+    </aside>
+
+    <!-- Services Grid -->
+    <div>
+        <div class="results-header">
+            <h2>{{ services.count }} Services Mile</h2>
+            {% if selected_category or search_query %}<a href="{% url 'services' %}" style="color:var(--primary);font-size:0.88rem;">Clear Filters ✕</a>{% endif %}
+        </div>
+        <div class="services-grid">
+            {% for service in services %}
+            <div class="service-card">
+                <div class="service-card-img">
+                    {% if service.image %}<img src="{{ service.image.url }}" alt="{{ service.name }}">{% else %}<div class="placeholder-icon">🧹</div>{% endif %}
+                    {% if service.get_discount_percentage > 0 %}<span class="service-badge">{{ service.get_discount_percentage }}% OFF</span>{% endif %}
+                </div>
+                <div class="service-card-body">
+                    <h3>{{ service.name }}</h3>
+                    <p>{{ service.short_description }}</p>
+                    <div class="service-meta">
+                        <div class="service-rating"><i class="fas fa-star"></i> {{ service.rating }} ({{ service.review_count }})</div>
+                        <div class="service-duration"><i class="fas fa-clock"></i> {{ service.get_duration_display }}</div>
+                    </div>
+                    <div class="service-price">
+                        <span class="price-current">₹{{ service.get_final_price }}</span>
+                        {% if service.discounted_price %}<span class="price-original">₹{{ service.price }}</span>{% endif %}
+                    </div>
+                    <div class="service-actions">
+                        <a href="{% url 'service_detail' service.slug %}" class="btn-outline">Details</a>
+                        <form method="post" action="{% url 'add_to_cart' service.id %}" style="flex:1">
+                            {% csrf_token %}
+                            <button type="submit" class="btn-primary" style="width:100%;justify-content:center;font-size:0.82rem;padding:10px;">
+                                <i class="fas fa-cart-plus"></i> Cart
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="no-results">
+                <i class="fas fa-search"></i>
+                <h3>Koi service nahi mili</h3>
+                <p>Dusra search karein ya filters clear karein</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

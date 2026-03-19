@@ -2,64 +2,321 @@
 {% block title %}My Orders - Utkarsh Cleaning{% endblock %}
 {% block extra_css %}
 <style>
-.orders-page { max-width:900px; margin:48px auto; padding:0 2rem; }
-.order-card { background:white; border-radius:var(--radius); box-shadow:var(--shadow); border:1px solid #e2e8f0; margin-bottom:20px; overflow:hidden; }
-.order-card-header { padding:20px 28px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #f1f5f9; flex-wrap:wrap; gap:12px; }
-.order-id { font-family:monospace; font-weight:700; color:var(--primary); font-size:1rem; }
-.status-badge { padding:6px 14px; border-radius:100px; font-size:0.78rem; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; }
-.status-pending { background:#fef3c7; color:#92400e; }
-.status-confirmed { background:#dbeafe; color:#1e40af; }
-.status-in_progress { background:#e0f2fe; color:#0c4a6e; }
-.status-completed { background:#d1fae5; color:#065f46; }
-.status-cancelled { background:#fee2e2; color:#991b1b; }
-.order-card-body { padding:20px 28px; }
-.order-items-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:12px; margin-bottom:16px; }
-.order-item-chip { display:flex; align-items:center; gap:10px; background:#f8fafc; border-radius:10px; padding:10px 14px; }
-.order-item-chip span { font-size:0.85rem; font-weight:600; }
-.order-card-footer { padding:16px 28px; border-top:1px solid #f1f5f9; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; }
-.order-total { font-size:1.1rem; font-weight:800; color:var(--primary); }
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Sora:wght@400;600;700&display=swap');
+
+  /* ── Hero ── */
+  .orders-hero {
+    background: linear-gradient(160deg, #0ea5e9 0%, #0369a1 55%, #075985 100%);
+    padding: 48px 2rem 56px;
+    position: relative; overflow: hidden;
+  }
+  .orders-hero::before {
+    content: ''; position: absolute;
+    width: 420px; height: 420px;
+    background: rgba(255,255,255,0.06); border-radius: 50%;
+    top: -160px; right: -80px; pointer-events: none;
+  }
+  .orders-hero::after {
+    content: ''; position: absolute;
+    width: 200px; height: 200px;
+    background: rgba(255,255,255,0.04); border-radius: 50%;
+    bottom: -60px; left: -40px; pointer-events: none;
+  }
+  .orders-hero-inner {
+    max-width: 900px; margin: 0 auto;
+    position: relative; z-index: 1;
+    display: flex; align-items: flex-end; justify-content: space-between;
+    flex-wrap: wrap; gap: 16px;
+  }
+  .orders-hero .tag {
+    display: inline-block;
+    background: rgba(255,255,255,0.15); color: rgba(255,255,255,0.95);
+    font-size: 0.72rem; font-weight: 800;
+    text-transform: uppercase; letter-spacing: 1.2px;
+    padding: 5px 14px; border-radius: 50px;
+    margin-bottom: 12px; backdrop-filter: blur(6px);
+  }
+  .orders-hero h1 {
+    font-family: 'Sora', sans-serif;
+    font-size: clamp(1.6rem, 4vw, 2.2rem); font-weight: 700;
+    color: white; line-height: 1.2; margin-bottom: 6px;
+  }
+  .orders-hero p { color: rgba(255,255,255,0.7); font-size: 0.9rem; }
+
+  .orders-count-pill {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.25);
+    color: white; padding: 10px 18px; border-radius: 50px;
+    font-size: 0.85rem; font-weight: 800;
+    backdrop-filter: blur(8px); white-space: nowrap;
+  }
+
+  /* ── Page Wrapper ── */
+  .orders-page {
+    max-width: 900px; margin: 0 auto;
+    padding: 36px 2rem 80px;
+  }
+
+  /* ── Order Card ── */
+  .order-card {
+    background: white;
+    border-radius: 22px;
+    border: 1.5px solid #e2e8f0;
+    box-shadow: 0 4px 24px rgba(14,165,233,0.06);
+    margin-bottom: 18px;
+    overflow: hidden;
+    transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+  }
+  .order-card:hover {
+    border-color: #bae6fd;
+    box-shadow: 0 10px 32px rgba(14,165,233,0.12);
+    transform: translateY(-2px);
+  }
+
+  /* Card Header */
+  .order-card-header {
+    padding: 18px 24px;
+    display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 1.5px solid #f1f5f9;
+    flex-wrap: wrap; gap: 12px;
+    background: linear-gradient(135deg, #fafcff, #f8fafc);
+  }
+  .order-header-left { display: flex; flex-direction: column; gap: 4px; }
+
+  .order-id {
+    font-family: 'Sora', sans-serif;
+    font-weight: 800; color: #0ea5e9;
+    font-size: 0.98rem; letter-spacing: 0.5px;
+  }
+  .order-date {
+    font-size: 0.76rem; color: #94a3b8; font-weight: 600;
+    display: flex; align-items: center; gap: 5px;
+  }
+
+  .order-header-right {
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  }
+
+  /* Status Badges */
+  .status-badge {
+    padding: 5px 14px; border-radius: 50px;
+    font-size: 0.72rem; font-weight: 800;
+    text-transform: uppercase; letter-spacing: 0.6px;
+    display: inline-flex; align-items: center; gap: 5px;
+  }
+  .status-badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; display: inline-block; }
+  .status-pending     { background: #fef3c7; color: #92400e; }
+  .status-pending::before { background: #f59e0b; }
+  .status-confirmed   { background: #dbeafe; color: #1e40af; }
+  .status-confirmed::before { background: #3b82f6; }
+  .status-in_progress { background: #e0f2fe; color: #0284c7; }
+  .status-in_progress::before { background: #0ea5e9; }
+  .status-completed   { background: #d1fae5; color: #065f46; }
+  .status-completed::before { background: #10b981; }
+  .status-cancelled   { background: #fee2e2; color: #991b1b; }
+  .status-cancelled::before { background: #ef4444; }
+
+  .order-service-date {
+    display: flex; align-items: center; gap: 5px;
+    font-size: 0.76rem; color: #64748b; font-weight: 700;
+    background: #f1f5f9; padding: 5px 10px; border-radius: 8px;
+  }
+
+  /* Card Body */
+  .order-card-body { padding: 18px 24px; }
+
+  .order-items-label {
+    font-size: 0.72rem; font-weight: 800; color: #94a3b8;
+    text-transform: uppercase; letter-spacing: 0.6px;
+    margin-bottom: 10px;
+  }
+  .order-items-grid {
+    display: flex; flex-wrap: wrap; gap: 8px;
+  }
+  .order-item-chip {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: #f0f9ff;
+    border: 1.5px solid #bae6fd;
+    border-radius: 10px; padding: 8px 14px;
+    transition: all 0.2s;
+  }
+  .order-item-chip:hover { background: #e0f2fe; border-color: #7dd3fc; }
+  .order-item-chip .chip-icon { font-size: 1rem; flex-shrink: 0; }
+  .order-item-chip .chip-text {
+    font-size: 0.82rem; font-weight: 700; color: #0f172a; white-space: nowrap;
+  }
+  .order-item-chip .chip-qty {
+    font-size: 0.72rem; font-weight: 800; color: #0ea5e9;
+    background: white; border-radius: 5px;
+    padding: 2px 6px; border: 1px solid #bae6fd;
+  }
+
+  /* Card Footer */
+  .order-card-footer {
+    padding: 14px 24px;
+    border-top: 1.5px solid #f1f5f9;
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 12px;
+    background: #fafcff;
+  }
+  .order-footer-left { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+  .order-total {
+    font-family: 'Sora', sans-serif;
+    font-size: 1.15rem; font-weight: 900; color: #0ea5e9;
+  }
+  .order-payment {
+    display: flex; align-items: center; gap: 5px;
+    font-size: 0.78rem; font-weight: 700; color: #64748b;
+    background: #f1f5f9; padding: 5px 10px; border-radius: 8px;
+  }
+
+  .order-detail-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 8px 18px; border-radius: 10px;
+    border: 2px solid #e2e8f0; color: #64748b;
+    font-size: 0.82rem; font-weight: 800;
+    transition: all 0.2s; background: white;
+    font-family: 'Nunito', sans-serif; white-space: nowrap;
+    text-decoration: none;
+  }
+  .order-detail-btn:hover {
+    border-color: #0ea5e9; color: #0ea5e9;
+    background: #e0f2fe;
+  }
+
+  /* ── Empty State ── */
+  .empty-orders {
+    text-align: center; padding: 72px 2rem;
+    display: flex; flex-direction: column; align-items: center;
+  }
+  .empty-orders-icon {
+    width: 100px; height: 100px;
+    background: linear-gradient(135deg, #e0f2fe, #bfdbfe);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 2.8rem; margin-bottom: 22px;
+  }
+  .empty-orders h2 {
+    font-family: 'Sora', sans-serif;
+    font-size: 1.5rem; font-weight: 700; color: #0f172a;
+    margin-bottom: 10px;
+  }
+  .empty-orders p { color: #64748b; font-size: 0.92rem; margin-bottom: 26px; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 640px) {
+    .orders-hero { padding: 36px 1.25rem 44px; }
+    .orders-page { padding: 24px 1rem 60px; }
+
+    .order-card { border-radius: 18px; margin-bottom: 14px; }
+    .order-card-header { padding: 14px 18px; }
+    .order-card-body   { padding: 14px 18px; }
+    .order-card-footer { padding: 12px 18px; }
+
+    .order-header-right { gap: 7px; }
+    .order-footer-left  { gap: 10px; }
+    .order-total { font-size: 1rem; }
+  }
+
+  @media (max-width: 400px) {
+    .orders-hero-inner { flex-direction: column; align-items: flex-start; }
+    .orders-count-pill { font-size: 0.78rem; padding: 8px 14px; }
+    .order-card-header { flex-direction: column; align-items: flex-start; }
+    .order-card-footer { flex-direction: column; align-items: flex-start; }
+    .order-detail-btn  { width: 100%; justify-content: center; }
+  }
 </style>
 {% endblock %}
+
 {% block content %}
+
+<!-- Hero -->
+<div class="orders-hero">
+  <div class="orders-hero-inner">
+    <div>
+      <div class="tag">📦 My Orders</div>
+      <h1>Mere Orders</h1>
+      <p>Aapki sari booking history ek jagah par</p>
+    </div>
+    {% if orders %}
+    <div class="orders-count-pill">
+      <i class="fas fa-receipt"></i>
+      {{ orders|length }} Order{{ orders|length|pluralize }}
+    </div>
+    {% endif %}
+  </div>
+</div>
+
 <div class="orders-page">
-    <h1 style="font-size:1.8rem;font-weight:800;margin-bottom:32px;">📦 Mere Orders</h1>
-    {% for order in orders %}
-    <div class="order-card">
-        <div class="order-card-header">
-            <div>
-                <div class="order-id">Order #{{ order.order_id|stringformat:"s"|slice:":8"|upper }}</div>
-                <div style="font-size:0.8rem;color:#64748b;margin-top:4px;">{{ order.created_at|date:"d M Y, H:i" }}</div>
-            </div>
-            <div style="display:flex;align-items:center;gap:12px;">
-                <div class="status-badge status-{{ order.status }}">{{ order.get_status_display }}</div>
-                <div style="font-size:0.8rem;color:#64748b;">📅 {{ order.service_date|date:"d M Y" }}</div>
-            </div>
+
+  {% for order in orders %}
+  <div class="order-card">
+
+    <!-- Header -->
+    <div class="order-card-header">
+      <div class="order-header-left">
+        <div class="order-id">
+          <i class="fas fa-hashtag" style="font-size:0.75rem;opacity:0.6"></i>
+          {{ order.order_id|stringformat:"s"|slice:":8"|upper }}
         </div>
-        <div class="order-card-body">
-            <div class="order-items-grid">
-                {% for item in order.items.all %}
-                <div class="order-item-chip">
-                    <span>🧹</span>
-                    <span>{{ item.service_name }} ×{{ item.quantity }}</span>
-                </div>
-                {% endfor %}
-            </div>
+        <div class="order-date">
+          <i class="fas fa-clock" style="font-size:0.7rem"></i>
+          {{ order.created_at|date:"d M Y, H:i" }}
         </div>
-        <div class="order-card-footer">
-            <div class="order-total">Total: ₹{{ order.total }}</div>
-            <div style="display:flex;gap:10px;">
-                <span style="font-size:0.8rem;color:#64748b;">Payment: {{ order.get_payment_method_display }}</span>
-                <a href="{% url 'order_detail' order.order_id %}" class="btn-outline" style="padding:8px 18px;font-size:0.85rem;">Details</a>
-            </div>
+      </div>
+      <div class="order-header-right">
+        <span class="status-badge status-{{ order.status }}">
+          {{ order.get_status_display }}
+        </span>
+        <div class="order-service-date">
+          <i class="fas fa-calendar-alt" style="font-size:0.72rem;color:#0ea5e9"></i>
+          {{ order.service_date|date:"d M Y" }}
         </div>
+      </div>
     </div>
-    {% empty %}
-    <div style="text-align:center;padding:80px 0;">
-        <div style="font-size:4rem;margin-bottom:24px;">📦</div>
-        <h2 style="font-size:1.5rem;margin-bottom:12px;">Koi order nahi mila</h2>
-        <p style="color:#64748b;margin-bottom:32px;">Abhi tak koi service book nahi ki. Pehla order karein!</p>
-        <a href="{% url 'services' %}" class="btn-primary" style="font-size:1rem;padding:16px 32px;">Services Dekhein</a>
+
+    <!-- Body -->
+    <div class="order-card-body">
+      <div class="order-items-label">Services Booked</div>
+      <div class="order-items-grid">
+        {% for item in order.items.all %}
+        <div class="order-item-chip">
+          <span class="chip-icon">🧹</span>
+          <span class="chip-text">{{ item.service_name }}</span>
+          <span class="chip-qty">×{{ item.quantity }}</span>
+        </div>
+        {% endfor %}
+      </div>
     </div>
-    {% endfor %}
+
+    <!-- Footer -->
+    <div class="order-card-footer">
+      <div class="order-footer-left">
+        <div class="order-total">₹{{ order.total }}</div>
+        <div class="order-payment">
+          <i class="fas fa-{% if order.payment_method == 'cod' %}money-bill-wave{% elif order.payment_method == 'upi' %}mobile-alt{% else %}credit-card{% endif %}" style="color:#0ea5e9;font-size:0.75rem"></i>
+          {{ order.get_payment_method_display }}
+        </div>
+      </div>
+      <a href="{% url 'order_detail' order.order_id %}" class="order-detail-btn">
+        <i class="fas fa-eye" style="font-size:0.75rem"></i> Details
+      </a>
+    </div>
+
+  </div>
+  {% empty %}
+
+  <!-- Empty State -->
+  <div class="empty-orders">
+    <div class="empty-orders-icon">📦</div>
+    <h2>Koi Order Nahi Mila</h2>
+    <p>Abhi tak koi service book nahi ki. Pehla order karein!</p>
+    <a href="{% url 'services' %}" class="btn-primary" style="font-size:1rem;padding:14px 32px;">
+      <i class="fas fa-broom"></i> Services Dekhein
+    </a>
+  </div>
+
+  {% endfor %}
 </div>
 {% endblock %}

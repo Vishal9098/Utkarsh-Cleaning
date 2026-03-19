@@ -1,43 +1,318 @@
 {% extends 'cleaning_app/base.html' %}
 {% block title %}Order Confirmed! - Utkarsh Cleaning{% endblock %}
+{% block extra_css %}
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Sora:wght@400;600;700&display=swap');
+
+  /* ── Page Background ── */
+  .confirm-page {
+    min-height: 80vh;
+    background: linear-gradient(160deg, #f0f9ff 0%, #e0f2fe 50%, #f0fdf4 100%);
+    display: flex; align-items: center; justify-content: center;
+    padding: 60px 1.5rem 80px;
+    position: relative; overflow: hidden;
+  }
+  .confirm-page::before {
+    content: ''; position: fixed;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(14,165,233,0.1) 0%, transparent 70%);
+    border-radius: 50%;
+    top: -200px; right: -150px; pointer-events: none; z-index: 0;
+  }
+  .confirm-page::after {
+    content: ''; position: fixed;
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(16,185,129,0.1) 0%, transparent 70%);
+    border-radius: 50%;
+    bottom: -100px; left: -100px; pointer-events: none; z-index: 0;
+  }
+
+  /* ── Card ── */
+  .confirm-card {
+    background: white;
+    border-radius: 28px;
+    padding: 52px 48px;
+    width: 100%; max-width: 640px;
+    box-shadow: 0 24px 80px rgba(15,23,42,0.1), 0 0 0 1px #e2e8f0;
+    position: relative; z-index: 1;
+    text-align: center;
+  }
+
+  /* ── Success Icon ── */
+  .success-icon-wrap {
+    position: relative;
+    display: inline-flex; align-items: center; justify-content: center;
+    margin-bottom: 24px;
+  }
+  .success-icon-wrap .ring {
+    position: absolute;
+    width: 100px; height: 100px;
+    border-radius: 50%;
+    border: 3px solid rgba(16,185,129,0.2);
+    animation: pulse-ring 2s ease-out infinite;
+  }
+  .success-icon-wrap .ring2 {
+    width: 116px; height: 116px;
+    border-color: rgba(16,185,129,0.1);
+    animation-delay: 0.4s;
+  }
+  @keyframes pulse-ring {
+    0%   { transform: scale(0.85); opacity: 1; }
+    100% { transform: scale(1.25); opacity: 0; }
+  }
+  .success-icon {
+    width: 80px; height: 80px;
+    background: linear-gradient(135deg, #10b981, #059669);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 2rem;
+    box-shadow: 0 8px 24px rgba(16,185,129,0.35);
+    position: relative; z-index: 1;
+    animation: pop-in 0.5s cubic-bezier(0.34,1.56,0.64,1) both;
+  }
+  @keyframes pop-in { 0%{transform:scale(0);opacity:0} 100%{transform:scale(1);opacity:1} }
+
+  /* ── Heading ── */
+  .confirm-card h1 {
+    font-family: 'Sora', sans-serif;
+    font-size: clamp(1.6rem, 4vw, 2rem); font-weight: 700;
+    color: #065f46; margin-bottom: 10px;
+  }
+  .confirm-card > p {
+    color: #64748b; font-size: 0.92rem; line-height: 1.75;
+    margin-bottom: 32px; max-width: 460px; margin-left: auto; margin-right: auto;
+  }
+
+  /* ── Order ID Box ── */
+  .order-id-box {
+    background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+    border: 1.5px solid #bbf7d0;
+    border-radius: 16px; padding: 22px;
+    margin-bottom: 24px;
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+  }
+  .order-id-label {
+    font-size: 0.72rem; font-weight: 800;
+    text-transform: uppercase; letter-spacing: 0.8px; color: #64748b;
+  }
+  .order-id-value {
+    font-family: 'Sora', sans-serif;
+    font-size: 1.4rem; font-weight: 900; color: #059669;
+    letter-spacing: 1px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .order-id-copy {
+    width: 28px; height: 28px;
+    background: white; border: 1.5px solid #bbf7d0;
+    border-radius: 8px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.75rem; color: #10b981;
+    transition: all 0.2s;
+  }
+  .order-id-copy:hover { background: #10b981; color: white; border-color: #10b981; }
+
+  /* ── Details Box ── */
+  .details-box {
+    background: #f8fafc; border-radius: 18px;
+    border: 1.5px solid #e2e8f0;
+    padding: 22px; margin-bottom: 16px;
+    text-align: left;
+  }
+  .details-box-title {
+    font-family: 'Sora', sans-serif;
+    font-size: 0.85rem; font-weight: 700; color: #0f172a;
+    margin-bottom: 14px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .details-box-title .box-icon {
+    width: 28px; height: 28px;
+    background: linear-gradient(135deg, #e0f2fe, #bfdbfe);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.85rem;
+  }
+
+  /* Order Items */
+  .order-item-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 10px 0; border-bottom: 1px solid #f1f5f9;
+    font-size: 0.875rem;
+  }
+  .order-item-row:last-of-type { border-bottom: none; }
+  .order-item-row .item-name { color: #334155; font-weight: 600; }
+  .order-item-row .item-qty  { font-size: 0.75rem; color: #94a3b8; font-weight: 700; margin-left: 4px; }
+  .order-item-row .item-price{ font-weight: 800; color: #0f172a; }
+
+  .order-total-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 14px 0 0; margin-top: 4px;
+    border-top: 1.5px solid #e2e8f0;
+  }
+  .order-total-row .t-label  { font-family: 'Sora', sans-serif; font-size: 0.95rem; font-weight: 700; color: #0f172a; }
+  .order-total-row .t-amount { font-family: 'Sora', sans-serif; font-size: 1.3rem; font-weight: 900; color: #0ea5e9; }
+
+  /* Schedule Box */
+  .schedule-box {
+    background: linear-gradient(135deg, #eff6ff, #dbeafe);
+    border: 1.5px solid #bfdbfe;
+    border-radius: 18px; padding: 20px 22px;
+    margin-bottom: 28px; text-align: left;
+  }
+  .schedule-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 14px; margin-top: 4px;
+  }
+  .schedule-item { display: flex; flex-direction: column; gap: 3px; }
+  .schedule-item .s-label {
+    font-size: 0.68rem; font-weight: 800; color: #64748b;
+    text-transform: uppercase; letter-spacing: 0.6px;
+  }
+  .schedule-item .s-value {
+    font-size: 0.875rem; font-weight: 800; color: #0f172a;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .schedule-item .s-value i { color: #0ea5e9; font-size: 0.8rem; }
+  .schedule-item.full { grid-column: 1 / -1; }
+
+  /* ── CTA Buttons ── */
+  .confirm-actions {
+    display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;
+  }
+  .btn-confirm-primary {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 13px 26px; border-radius: 13px;
+    background: linear-gradient(135deg, #0ea5e9, #0284c7);
+    color: white; border: none;
+    font-family: 'Sora', sans-serif;
+    font-size: 0.92rem; font-weight: 700; cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 6px 18px rgba(14,165,233,0.3);
+    text-decoration: none;
+  }
+  .btn-confirm-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 26px rgba(14,165,233,0.4); }
+
+  .btn-confirm-outline {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 13px 24px; border-radius: 13px;
+    border: 2px solid #e2e8f0; color: #64748b;
+    font-family: 'Sora', sans-serif;
+    font-size: 0.92rem; font-weight: 700; cursor: pointer;
+    transition: all 0.2s; background: white;
+    text-decoration: none;
+  }
+  .btn-confirm-outline:hover { border-color: #0ea5e9; color: #0ea5e9; background: #e0f2fe; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 600px) {
+    .confirm-page { padding: 32px 1rem 56px; }
+    .confirm-card { padding: 36px 24px; border-radius: 22px; }
+    .schedule-grid { grid-template-columns: 1fr; gap: 12px; }
+    .schedule-item.full { grid-column: 1; }
+    .confirm-actions { flex-direction: column; align-items: stretch; }
+    .btn-confirm-primary, .btn-confirm-outline { justify-content: center; }
+  }
+
+  @media (max-width: 380px) {
+    .confirm-card { padding: 28px 18px; }
+    .order-id-value { font-size: 1.15rem; }
+    .confirm-card h1 { font-size: 1.5rem; }
+  }
+</style>
+{% endblock %}
+
 {% block content %}
-<div style="max-width:700px;margin:80px auto;padding:0 2rem;text-align:center;">
-    <div style="background:white;border-radius:24px;padding:60px 48px;box-shadow:0 20px 60px rgba(0,0,0,0.1);border:1px solid #e2e8f0;">
-        <div style="width:80px;height:80px;background:linear-gradient(135deg,#10b981,#059669);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 24px;font-size:2rem;">✅</div>
-        <h1 style="font-size:2rem;font-weight:800;color:#065f46;margin-bottom:12px;">Order Confirmed!</h1>
-        <p style="color:#64748b;margin-bottom:32px;font-size:1rem;line-height:1.7;">Aapka order successfully place ho gaya hai. Hamari team jald hi aapse contact karegi.</p>
-        
-        <div style="background:linear-gradient(135deg,#f0fdf4,#dcfce7);border-radius:16px;padding:24px;margin-bottom:32px;border:1px solid #bbf7d0;">
-            <div style="font-size:0.85rem;color:#64748b;margin-bottom:8px;">Order ID</div>
-            <div style="font-size:1.3rem;font-weight:800;color:#059669;font-family:monospace;">#{{ order.order_id|stringformat:"s"|slice:":8"|upper }}</div>
-        </div>
+<div class="confirm-page">
+  <div class="confirm-card">
 
-        <div style="text-align:left;background:#f8fafc;border-radius:16px;padding:24px;margin-bottom:32px;">
-            <h3 style="font-size:1rem;font-weight:700;margin-bottom:16px;">Order Details</h3>
-            {% for item in order.items.all %}
-            <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #e2e8f0;font-size:0.9rem;">
-                <span>{{ item.service_name }} × {{ item.quantity }}</span>
-                <strong>₹{{ item.get_subtotal }}</strong>
-            </div>
-            {% endfor %}
-            <div style="display:flex;justify-content:space-between;padding:14px 0 0;font-size:1rem;font-weight:800;color:#1a56db;">
-                <span>Total</span><span>₹{{ order.total }}</span>
-            </div>
-        </div>
-
-        <div style="background:#eff6ff;border-radius:12px;padding:20px;margin-bottom:32px;text-align:left;">
-            <h4 style="font-size:0.9rem;font-weight:700;margin-bottom:12px;">📅 Service Schedule</h4>
-            <p style="font-size:0.88rem;color:#64748b;">
-                <strong>Date:</strong> {{ order.service_date|date:"d F Y" }}<br>
-                <strong>Time:</strong> {{ order.service_time|time:"H:i" }}<br>
-                <strong>Address:</strong> {{ order.address_line1 }}, {{ order.city }}
-            </p>
-        </div>
-
-        <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;">
-            <a href="{% url 'my_orders' %}" class="btn-primary" style="padding:14px 28px;">My Orders Dekhein</a>
-            <a href="{% url 'home' %}" class="btn-outline" style="padding:14px 28px;">Home Par Jaayein</a>
-        </div>
+    <!-- Success Icon -->
+    <div class="success-icon-wrap">
+      <div class="ring"></div>
+      <div class="ring ring2"></div>
+      <div class="success-icon">✅</div>
     </div>
+
+    <h1>Order Confirmed!</h1>
+    <p>Aapka order successfully place ho gaya hai. Hamari team jald hi aapse contact karegi aur service complete karegi.</p>
+
+    <!-- Order ID -->
+    <div class="order-id-box">
+      <div class="order-id-label">Order ID</div>
+      <div class="order-id-value">
+        <span id="orderIdText">#{{ order.order_id|stringformat:"s"|slice:":8"|upper }}</span>
+        <button class="order-id-copy" onclick="copyOrderId()" title="Copy Order ID">
+          <i class="fas fa-copy" id="copyIcon"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Order Details -->
+    <div class="details-box">
+      <div class="details-box-title">
+        <div class="box-icon">🧾</div>
+        Order Details
+      </div>
+
+      {% for item in order.items.all %}
+      <div class="order-item-row">
+        <span class="item-name">
+          {{ item.service_name }}
+          <span class="item-qty">× {{ item.quantity }}</span>
+        </span>
+        <span class="item-price">₹{{ item.get_subtotal }}</span>
+      </div>
+      {% endfor %}
+
+      <div class="order-total-row">
+        <span class="t-label">Total Amount</span>
+        <span class="t-amount">₹{{ order.total }}</span>
+      </div>
+    </div>
+
+    <!-- Schedule -->
+    <div class="schedule-box">
+      <div class="details-box-title" style="background:transparent;padding:0;border:none;margin-bottom:14px">
+        <div class="box-icon" style="background:linear-gradient(135deg,#dbeafe,#bfdbfe)">📅</div>
+        Service Schedule
+      </div>
+      <div class="schedule-grid">
+        <div class="schedule-item">
+          <span class="s-label">Service Date</span>
+          <span class="s-value"><i class="fas fa-calendar-alt"></i> {{ order.service_date|date:"d F Y" }}</span>
+        </div>
+        <div class="schedule-item">
+          <span class="s-label">Service Time</span>
+          <span class="s-value"><i class="fas fa-clock"></i> {{ order.service_time|time:"H:i" }}</span>
+        </div>
+        <div class="schedule-item full">
+          <span class="s-label">Address</span>
+          <span class="s-value"><i class="fas fa-map-marker-alt"></i> {{ order.address_line1 }}, {{ order.city }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="confirm-actions">
+      <a href="{% url 'my_orders' %}" class="btn-confirm-primary">
+        <i class="fas fa-receipt"></i> My Orders Dekhein
+      </a>
+      <a href="{% url 'home' %}" class="btn-confirm-outline">
+        <i class="fas fa-home"></i> Home Par Jaayein
+      </a>
+    </div>
+
+  </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  function copyOrderId() {
+    const text = document.getElementById('orderIdText').textContent.trim();
+    navigator.clipboard.writeText(text).then(() => {
+      const icon = document.getElementById('copyIcon');
+      icon.className = 'fas fa-check';
+      setTimeout(() => { icon.className = 'fas fa-copy'; }, 2000);
+    });
+  }
+</script>
 {% endblock %}

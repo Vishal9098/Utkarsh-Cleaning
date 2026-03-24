@@ -1,0 +1,424 @@
+{% extends 'cleaning_app/base.html' %}
+{% block title %}My Profile - Utkarsh Cleaning{% endblock %}
+{% block extra_css %}
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Sora:wght@400;600;700&display=swap');
+
+  /* ── Hero ── */
+  .profile-hero {
+    background: linear-gradient(160deg, #0ea5e9 0%, #0369a1 55%, #075985 100%);
+    padding: 44px 2rem 52px;
+    position: relative; overflow: hidden;
+  }
+  .profile-hero::before {
+    content: ''; position: absolute;
+    width: 420px; height: 420px;
+    background: rgba(255,255,255,0.06); border-radius: 50%;
+    top: -150px; right: -80px; pointer-events: none;
+  }
+  .profile-hero::after {
+    content: ''; position: absolute;
+    width: 200px; height: 200px;
+    background: rgba(255,255,255,0.04); border-radius: 50%;
+    bottom: -60px; left: -40px; pointer-events: none;
+  }
+  .profile-hero-inner {
+    max-width: 960px; margin: 0 auto;
+    position: relative; z-index: 1;
+    display: flex; align-items: center; gap: 24px; flex-wrap: wrap;
+  }
+  .hero-avatar {
+    width: 72px; height: 72px; flex-shrink: 0;
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgba(255,255,255,0.25), rgba(255,255,255,0.12));
+    border: 3px solid rgba(255,255,255,0.35);
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-family: 'Sora', sans-serif;
+    font-size: 1.8rem; font-weight: 800;
+    backdrop-filter: blur(8px);
+  }
+  .hero-info { flex: 1; min-width: 0; }
+  .hero-info .tag {
+    display: inline-block;
+    background: rgba(255,255,255,0.15); color: rgba(255,255,255,0.95);
+    font-size: 0.7rem; font-weight: 800;
+    text-transform: uppercase; letter-spacing: 1.2px;
+    padding: 4px 12px; border-radius: 50px;
+    margin-bottom: 8px; backdrop-filter: blur(6px);
+  }
+  .hero-info h1 {
+    font-family: 'Sora', sans-serif;
+    font-size: clamp(1.3rem, 3vw, 1.75rem); font-weight: 700;
+    color: white; margin-bottom: 4px; line-height: 1.2;
+  }
+  .hero-info p { color: rgba(255,255,255,0.65); font-size: 0.85rem; font-weight: 600; }
+  .hero-member-badge {
+    display: flex; align-items: center; gap: 7px;
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: rgba(255,255,255,0.85);
+    padding: 8px 16px; border-radius: 50px;
+    font-size: 0.78rem; font-weight: 700;
+    backdrop-filter: blur(8px); white-space: nowrap;
+  }
+
+  /* ── Page Layout ── */
+  .profile-page {
+    max-width: 960px; margin: 0 auto;
+    padding: 36px 2rem 80px;
+    display: grid; grid-template-columns: 260px 1fr;
+    gap: 24px; align-items: start;
+  }
+
+  /* ── Sidebar ── */
+  .sidebar { display: flex; flex-direction: column; gap: 16px; }
+
+  .sidebar-avatar-card {
+    background: white; border-radius: 22px;
+    border: 1.5px solid #e2e8f0;
+    padding: 28px 22px;
+    box-shadow: 0 4px 20px rgba(14,165,233,0.06);
+    text-align: center;
+  }
+  .sidebar-avatar {
+    width: 80px; height: 80px; border-radius: 50%; margin: 0 auto 14px;
+    background: linear-gradient(135deg, #0ea5e9, #0369a1);
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-family: 'Sora', sans-serif;
+    font-size: 2rem; font-weight: 800;
+    box-shadow: 0 8px 24px rgba(14,165,233,0.3);
+  }
+  .sidebar-avatar-card h3 {
+    font-family: 'Sora', sans-serif;
+    font-size: 1rem; font-weight: 700; color: #0f172a; margin-bottom: 4px;
+  }
+  .sidebar-avatar-card .email {
+    color: #64748b; font-size: 0.8rem; font-weight: 600;
+    word-break: break-all;
+  }
+  .sidebar-avatar-card .joined {
+    display: inline-flex; align-items: center; gap: 5px;
+    margin-top: 10px; font-size: 0.74rem; font-weight: 700;
+    color: #94a3b8; background: #f1f5f9;
+    padding: 4px 10px; border-radius: 6px;
+  }
+
+  .sidebar-nav-card {
+    background: white; border-radius: 20px;
+    border: 1.5px solid #e2e8f0;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(14,165,233,0.06);
+  }
+  .sidebar-nav-card .nav-title {
+    padding: 14px 18px 10px;
+    font-size: 0.68rem; font-weight: 800; color: #94a3b8;
+    text-transform: uppercase; letter-spacing: 0.8px;
+    border-bottom: 1px solid #f1f5f9;
+  }
+  .sidebar-nav-link {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 18px; font-size: 0.875rem; font-weight: 700;
+    color: #475569; text-decoration: none;
+    border-bottom: 1px solid #f8fafc;
+    transition: all 0.15s;
+  }
+  .sidebar-nav-link:last-child { border-bottom: none; }
+  .sidebar-nav-link:hover { background: #f0f9ff; color: #0284c7; }
+  .sidebar-nav-link i { width: 18px; text-align: center; color: #0ea5e9; font-size: 0.85rem; }
+  .sidebar-nav-link.logout { color: #ef4444; }
+  .sidebar-nav-link.logout i { color: #ef4444; }
+  .sidebar-nav-link.logout:hover { background: #fee2e2; color: #dc2626; }
+
+  /* ── Main Content ── */
+  .main-content { display: flex; flex-direction: column; gap: 20px; }
+
+  /* Form Card */
+  .form-card {
+    background: white; border-radius: 22px;
+    border: 1.5px solid #e2e8f0; padding: 28px 30px;
+    box-shadow: 0 4px 20px rgba(14,165,233,0.06);
+  }
+  .form-card-title {
+    display: flex; align-items: center; gap: 11px;
+    font-family: 'Sora', sans-serif;
+    font-size: 1rem; font-weight: 700; color: #0f172a;
+    margin-bottom: 22px; padding-bottom: 16px;
+    border-bottom: 1.5px solid #f1f5f9;
+  }
+  .form-card-title .title-icon {
+    width: 34px; height: 34px;
+    background: linear-gradient(135deg, #e0f2fe, #bfdbfe);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.88rem; color: #0284c7; flex-shrink: 0;
+  }
+
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .form-full  { grid-column: 1 / -1; }
+  .form-group { display: flex; flex-direction: column; }
+  .form-group label {
+    font-size: 0.73rem; font-weight: 800; color: #0f172a;
+    text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 7px;
+  }
+  .form-group input,
+  .form-group .form-control,
+  .form-group select,
+  .form-group textarea {
+    width: 100%; padding: 10px 14px;
+    border: 2px solid #e2e8f0; border-radius: 12px;
+    font-size: 0.9rem; font-family: 'Nunito', sans-serif;
+    color: #0f172a; background: #f8fafc;
+    transition: border-color 0.2s, background 0.2s, box-shadow 0.2s; outline: none;
+  }
+  .form-group input:focus,
+  .form-group .form-control:focus,
+  .form-group select:focus,
+  .form-group textarea:focus {
+    border-color: #0ea5e9; background: white;
+    box-shadow: 0 0 0 4px rgba(14,165,233,0.12);
+  }
+
+  .update-btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    margin-top: 6px; padding: 12px 26px; border-radius: 13px;
+    background: linear-gradient(135deg, #0ea5e9, #0284c7);
+    color: white; border: none;
+    font-family: 'Sora', sans-serif;
+    font-size: 0.92rem; font-weight: 700; cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 6px 18px rgba(14,165,233,0.3);
+  }
+  .update-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 26px rgba(14,165,233,0.4); }
+  .update-btn:active { transform: translateY(0); }
+
+  /* Recent Orders Card */
+  .orders-card {
+    background: white; border-radius: 22px;
+    border: 1.5px solid #e2e8f0; overflow: hidden;
+    box-shadow: 0 4px 20px rgba(14,165,233,0.06);
+  }
+  .orders-card-header {
+    padding: 18px 24px;
+    background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+    border-bottom: 1.5px solid #e2e8f0;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .orders-card-header .o-title {
+    display: flex; align-items: center; gap: 9px;
+    font-family: 'Sora', sans-serif;
+    font-size: 0.92rem; font-weight: 700; color: #0f172a;
+  }
+  .orders-card-header .o-title .card-icon {
+    width: 28px; height: 28px;
+    background: linear-gradient(135deg, #e0f2fe, #bfdbfe);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.78rem;
+  }
+  .orders-card-header .see-all {
+    font-size: 0.78rem; font-weight: 800; color: #0ea5e9;
+    text-decoration: none; transition: color 0.2s;
+  }
+  .orders-card-header .see-all:hover { color: #0284c7; }
+
+  .recent-order-row {
+    display: flex; align-items: center;
+    padding: 14px 24px; gap: 14px;
+    border-bottom: 1px solid #f1f5f9;
+    transition: background 0.15s;
+  }
+  .recent-order-row:last-child { border-bottom: none; }
+  .recent-order-row:hover { background: #fafcff; }
+
+  .recent-order-id {
+    flex: 1; min-width: 0;
+  }
+  .recent-order-id .r-id {
+    font-family: 'Sora', sans-serif;
+    font-weight: 800; color: #0ea5e9; font-size: 0.875rem;
+  }
+  .recent-order-id .r-date {
+    font-size: 0.74rem; color: #94a3b8; font-weight: 600; margin-top: 2px;
+  }
+
+  .recent-status {
+    padding: 4px 12px; border-radius: 50px;
+    font-size: 0.7rem; font-weight: 800;
+    text-transform: uppercase; letter-spacing: 0.4px;
+    flex-shrink: 0;
+  }
+  .status-pending     { background: #fef3c7; color: #92400e; }
+  .status-confirmed   { background: #dbeafe; color: #1e40af; }
+  .status-in_progress { background: #e0f2fe; color: #0284c7; }
+  .status-completed   { background: #d1fae5; color: #065f46; }
+  .status-cancelled   { background: #fee2e2; color: #991b1b; }
+
+  .recent-total {
+    font-family: 'Sora', sans-serif;
+    font-weight: 900; font-size: 0.92rem; color: #0f172a;
+    flex-shrink: 0;
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 768px) {
+    .profile-page { grid-template-columns: 1fr; gap: 16px; }
+    .profile-hero-inner { flex-direction: column; align-items: flex-start; gap: 16px; }
+
+    /* Sidebar goes horizontal on mobile */
+    .sidebar { flex-direction: row; flex-wrap: wrap; gap: 12px; }
+    .sidebar-avatar-card { flex: 1; min-width: 240px; }
+    .sidebar-nav-card    { flex: 1; min-width: 200px; }
+  }
+
+  @media (max-width: 580px) {
+    .profile-hero { padding: 32px 1.25rem 40px; }
+    .profile-page { padding: 24px 1rem 60px; }
+    .form-card { padding: 20px 18px; border-radius: 18px; }
+    .form-grid { grid-template-columns: 1fr; gap: 12px; }
+    .form-full { grid-column: 1; }
+    .orders-card-header { padding: 14px 18px; }
+    .recent-order-row { padding: 12px 18px; }
+
+    /* Sidebar stacks fully */
+    .sidebar { flex-direction: column; }
+    .sidebar-avatar-card, .sidebar-nav-card { width: 100%; min-width: unset; }
+  }
+
+  @media (max-width: 400px) {
+    .profile-hero { padding: 28px 1rem 36px; }
+    .hero-avatar  { width: 56px; height: 56px; font-size: 1.4rem; }
+    .hero-info h1 { font-size: 1.2rem; }
+    .recent-order-row { flex-wrap: wrap; gap: 8px; }
+    .recent-total { width: 100%; text-align: right; }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- Hero -->
+<div class="profile-hero">
+  <div class="profile-hero-inner">
+    <div class="hero-avatar">{{ user.username|first|upper }}</div>
+    <div class="hero-info">
+      <div class="tag">👤 My Profile</div>
+      <h1>{{ user.get_full_name|default:user.username }}</h1>
+      <p>{{ user.email }}</p>
+    </div>
+    <div class="hero-member-badge">
+      <i class="fas fa-calendar-alt" style="font-size:0.75rem"></i>
+      Member since {{ user.date_joined|date:"M Y" }}
+    </div>
+  </div>
+</div>
+
+<div class="profile-page">
+
+  <!-- ── Sidebar ── -->
+  <div class="sidebar">
+
+    <!-- Avatar Card -->
+    <div class="sidebar-avatar-card">
+      <div class="sidebar-avatar">{{ user.username|first|upper }}</div>
+      <h3>{{ user.get_full_name|default:user.username }}</h3>
+      <p class="email">{{ user.email }}</p>
+      <div class="joined">
+        <i class="fas fa-star" style="color:#f59e0b;font-size:0.7rem"></i>
+        Member since {{ user.date_joined|date:"M Y" }}
+      </div>
+    </div>
+
+    <!-- Nav Links -->
+    <div class="sidebar-nav-card">
+      <div class="nav-title">Quick Links</div>
+      <a href="{% url 'my_orders' %}" class="sidebar-nav-link">
+        <i class="fas fa-receipt"></i> My Orders
+      </a>
+      <a href="{% url 'cart' %}" class="sidebar-nav-link">
+        <i class="fas fa-shopping-cart"></i> My Cart
+      </a>
+      <a href="{% url 'services' %}" class="sidebar-nav-link">
+        <i class="fas fa-broom"></i> Services
+      </a>
+      <a href="{% url 'logout' %}" class="sidebar-nav-link logout">
+        <i class="fas fa-sign-out-alt"></i> Logout
+      </a>
+    </div>
+
+  </div>
+
+  <!-- ── Main Content ── -->
+  <div class="main-content">
+
+    <!-- Profile Update Form -->
+    <div class="form-card">
+      <div class="form-card-title">
+        <div class="title-icon"><i class="fas fa-user-edit"></i></div>
+        Profile Update Karein
+      </div>
+
+      <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="form-grid">
+
+          <div class="form-group">
+            <label>First Name</label>
+            <input type="text" name="first_name" value="{{ user.first_name }}" placeholder="First name">
+          </div>
+          <div class="form-group">
+            <label>Last Name</label>
+            <input type="text" name="last_name" value="{{ user.last_name }}" placeholder="Last name">
+          </div>
+
+          <div class="form-group form-full">
+            <label>Email</label>
+            <input type="email" name="email" value="{{ user.email }}" placeholder="Email address">
+          </div>
+
+          {% for field in form %}
+          {% if field.name != 'avatar' %}
+          <div class="form-group form-full">
+            <label>{{ field.label }}</label>
+            {{ field }}
+          </div>
+          {% endif %}
+          {% endfor %}
+
+        </div>
+
+        <button type="submit" class="update-btn">
+          <i class="fas fa-save"></i> Profile Update Karein
+        </button>
+      </form>
+    </div>
+
+    <!-- Recent Orders -->
+    {% if recent_orders %}
+    <div class="orders-card">
+      <div class="orders-card-header">
+        <div class="o-title">
+          <div class="card-icon">📦</div>
+          Recent Orders
+        </div>
+        <a href="{% url 'my_orders' %}" class="see-all">Sab dekhein →</a>
+      </div>
+
+      {% for order in recent_orders %}
+      <div class="recent-order-row">
+        <div class="recent-order-id">
+          <div class="r-id">#{{ order.order_id|stringformat:"s"|slice:":8"|upper }}</div>
+          <div class="r-date">{{ order.created_at|date:"d M Y" }}</div>
+        </div>
+        <span class="recent-status status-{{ order.status }}">
+          {{ order.get_status_display }}
+        </span>
+        <div class="recent-total">₹{{ order.total }}</div>
+      </div>
+      {% endfor %}
+
+    </div>
+    {% endif %}
+
+  </div>
+</div>
+{% endblock %}

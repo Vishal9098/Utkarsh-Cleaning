@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Invoice {{ invoice.invoice_number }}</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: #fafaf8;
+      color: #0a0a0f;
+      padding: 30px;
+    }
+
+    .page {
+      max-width: 780px;
+      margin: 0 auto;
+      background: #ffffff;
+      border-radius: 12px;
+    }
+
+    /* Header */
+    .header {
+      background: #0a0a0f;
+      padding: 36px 44px;
+      border-radius: 12px 12px 0 0;
+    }
+    .header-inner {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+    .brand-name {
+      font-size: 1.8rem;
+      font-weight: 900;
+      color: #ffffff;
+      letter-spacing: -0.5px;
+    }
+    .brand-name span { color: #2d9455; }
+    .brand-tagline {
+      font-size: 0.7rem;
+      color: #888888;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-top: 5px;
+    }
+    .invoice-label {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #ffffff;
+      text-align: right;
+    }
+    .invoice-number {
+      font-size: 0.78rem;
+      color: #2d9455;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      margin-top: 5px;
+      text-align: right;
+    }
+
+    /* Meta Strip */
+    .meta-strip {
+      background: #1a6b3a;
+      padding: 12px 44px;
+      display: flex;
+      gap: 40px;
+    }
+    .meta-label {
+      font-size: 0.6rem;
+      color: rgba(255,255,255,0.6);
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      font-weight: 600;
+    }
+    .meta-value {
+      font-size: 0.82rem;
+      color: #ffffff;
+      font-weight: 500;
+      margin-top: 2px;
+    }
+
+    /* Body */
+    .body { padding: 36px 44px; }
+
+    /* Bill To */
+    .bill-section {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 32px;
+      padding-bottom: 28px;
+      border-bottom: 1.5px solid #e5e7eb;
+    }
+    .section-label {
+      font-size: 0.62rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: #1a6b3a;
+      margin-bottom: 8px;
+    }
+    .customer-name {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #0a0a0f;
+      margin-bottom: 4px;
+    }
+    .customer-detail {
+      font-size: 0.82rem;
+      color: #6b7280;
+      line-height: 1.8;
+    }
+    .status-pill {
+      background: #e8f5ee;
+      border: 1.5px solid #b6dfc5;
+      border-radius: 50px;
+      padding: 7px 16px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: #1a6b3a;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    /* Table */
+    .table-wrap {
+      margin-bottom: 28px;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1.5px solid #e5e7eb;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    thead tr { background: #0a0a0f; }
+    thead th {
+      padding: 13px 18px;
+      font-size: 0.62rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: #888888;
+      text-align: left;
+    }
+    thead th:last-child { text-align: right; }
+
+    tbody tr { border-bottom: 1px solid #e5e7eb; }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:nth-child(even) { background: #fafafa; }
+
+    tbody td {
+      padding: 14px 18px;
+      font-size: 0.85rem;
+      color: #0a0a0f;
+    }
+    tbody td:last-child { text-align: right; font-weight: 600; }
+
+    .service-name { font-weight: 600; }
+    .qty-badge {
+      background: #e8f5ee;
+      color: #1a6b3a;
+      font-size: 0.68rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 20px;
+      margin-left: 6px;
+    }
+
+    /* Totals */
+    .totals-section {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 36px;
+    }
+    .totals-box {
+      width: 280px;
+      background: #fafaf8;
+      border-radius: 12px;
+      border: 1.5px solid #e5e7eb;
+      overflow: hidden;
+    }
+    .totals-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 11px 18px;
+      border-bottom: 1px solid #e5e7eb;
+      font-size: 0.85rem;
+    }
+    .totals-row:last-child { border-bottom: none; }
+    .t-label { color: #6b7280; }
+    .t-val { font-weight: 600; color: #0a0a0f; }
+
+    .totals-row.grand { background: #0a0a0f; padding: 14px 18px; }
+    .totals-row.grand .t-label {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: rgba(255,255,255,0.7);
+    }
+    .totals-row.grand .t-val {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #2d9455;
+    }
+
+    /* Footer */
+    .footer {
+      border-top: 1.5px solid #e5e7eb;
+      padding: 20px 44px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .footer-note {
+      font-size: 0.76rem;
+      color: #6b7280;
+      line-height: 1.6;
+    }
+    .footer-note strong { color: #0a0a0f; }
+    .thank-you {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #1a6b3a;
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-inner">
+      <div>
+        <div class="brand-name">Utkarsh<span>.</span></div>
+        <div class="brand-tagline">Cleaning Services</div>
+      </div>
+      <div>
+        <div class="invoice-label">Invoice</div>
+        <div class="invoice-number">{{ invoice.invoice_number }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Meta Strip -->
+  <div class="meta-strip">
+    <div>
+      <div class="meta-label">Issue Date</div>
+      <div class="meta-value">{{ invoice.created_at|date:"d M Y" }}</div>
+    </div>
+    <div>
+      <div class="meta-label">Service Date</div>
+      <div class="meta-value">{{ order.service_date|date:"d M Y" }}</div>
+    </div>
+    <div>
+      <div class="meta-label">Payment</div>
+      <div class="meta-value">{{ order.get_payment_method_display }}</div>
+    </div>
+  </div>
+
+  <!-- Body -->
+  <div class="body">
+
+    <!-- Bill To -->
+    <div class="bill-section">
+      <div>
+        <div class="section-label">Bill To</div>
+        <div class="customer-name">{{ order.customer_name }}</div>
+        <div class="customer-detail">
+          Phone: {{ order.customer_phone }}<br>
+          Email: {{ order.customer_email }}<br>
+          Address: {{ order.address_line1 }}, {{ order.city }} - {{ order.pincode }}
+        </div>
+      </div>
+      <div class="status-pill">Confirmed</div>
+    </div>
+
+    <!-- Table -->
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Service</th>
+            <th>Unit Price</th>
+            <th>Qty</th>
+            <th>Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in order.items.all %}
+          <tr>
+            <td style="color:#9ca3af;font-weight:600;">{{ forloop.counter }}</td>
+            <td><span class="service-name">{{ item.service_name }}</span></td>
+            <td>Rs. {{ item.price }}</td>
+            <td><span class="qty-badge">x {{ item.quantity }}</span></td>
+            <td>Rs. {{ item.get_subtotal }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Totals -->
+    <div class="totals-section">
+      <div class="totals-box">
+        <div class="totals-row">
+          <span class="t-label">Subtotal</span>
+          <span class="t-val">Rs. {{ invoice.subtotal }}</span>
+        </div>
+        <div class="totals-row">
+          <span class="t-label">GST (18%)</span>
+          <span class="t-val">Rs. {{ invoice.gst_amount }}</span>
+        </div>
+        {% if order.discount %}
+        <div class="totals-row">
+          <span class="t-label">Discount</span>
+          <span class="t-val" style="color:#059669;">- Rs. {{ order.discount }}</span>
+        </div>
+        {% endif %}
+        <div class="totals-row grand">
+          <span class="t-label">Grand Total</span>
+          <span class="t-val">Rs. {{ invoice.grand_total }}</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <div class="footer-note">
+      <strong>Utkarsh Cleaning Services</strong><br>
+      GST: 23ABCDE1234F1Z5 · support@utkarsh.com
+    </div>
+    <div class="thank-you">Thank you!</div>
+  </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,376 @@
+{% extends 'cleaning_app/base.html' %}
+{% block title %}About Us - Utkarsh Cleaning{% endblock %}
+{% block extra_css %}
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Sora:wght@400;600;700&display=swap');
+
+  /* ── Hero ── */
+  .about-hero {
+    background: linear-gradient(160deg, #0ea5e9 0%, #0369a1 55%, #075985 100%);
+    padding: 72px 2rem 80px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .about-hero::before {
+    content: '';
+    position: absolute;
+    width: 500px; height: 500px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 50%;
+    top: -200px; right: -100px;
+    pointer-events: none;
+  }
+  .about-hero::after {
+    content: '';
+    position: absolute;
+    width: 280px; height: 280px;
+    background: rgba(255,255,255,0.04);
+    border-radius: 50%;
+    bottom: -80px; left: -60px;
+    pointer-events: none;
+  }
+  .about-hero .tag {
+    display: inline-block;
+    background: rgba(255,255,255,0.15);
+    color: rgba(255,255,255,0.95);
+    font-size: 0.72rem; font-weight: 800;
+    text-transform: uppercase; letter-spacing: 1.2px;
+    padding: 6px 14px; border-radius: 50px;
+    margin-bottom: 16px;
+    backdrop-filter: blur(6px);
+    position: relative; z-index: 1;
+  }
+  .about-hero h1 {
+    font-family: 'Sora', sans-serif;
+    font-size: clamp(1.8rem, 5vw, 2.8rem); font-weight: 700;
+    color: white; line-height: 1.2;
+    margin-bottom: 12px;
+    position: relative; z-index: 1;
+  }
+  .about-hero p {
+    color: rgba(255,255,255,0.75);
+    font-size: 1rem;
+    position: relative; z-index: 1;
+  }
+
+  /* ── Page wrapper ── */
+  .about-page { max-width: 960px; margin: 0 auto; padding: 64px 2rem 80px; }
+
+  /* ── Story Section ── */
+  .story-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap: 56px;
+    align-items: center;
+    margin-bottom: 80px;
+  }
+
+  .story-visual {
+    background: linear-gradient(135deg, var(--primary-light, #e0f2fe), #bfdbfe);
+    border-radius: 28px;
+    padding: 64px 40px;
+    text-align: center;
+    font-size: 5rem;
+    box-shadow: 0 16px 48px rgba(14,165,233,0.15);
+    border: 1.5px solid rgba(14,165,233,0.15);
+    position: relative;
+    overflow: hidden;
+  }
+  .story-visual::before {
+    content: '';
+    position: absolute;
+    width: 180px; height: 180px;
+    background: rgba(14,165,233,0.08);
+    border-radius: 50%;
+    top: -60px; right: -40px;
+  }
+  .story-visual .trophy { position: relative; z-index: 1; display: inline-block; animation: float 3s ease-in-out infinite; }
+  @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+
+  .story-content .tag {
+    display: inline-block;
+    background: #e0f2fe;
+    color: #0284c7;
+    font-size: 0.72rem; font-weight: 800;
+    text-transform: uppercase; letter-spacing: 1px;
+    padding: 5px 12px; border-radius: 50px;
+    margin-bottom: 14px;
+  }
+  .story-content h2 {
+    font-family: 'Sora', sans-serif;
+    font-size: clamp(1.4rem, 3vw, 2rem); font-weight: 700;
+    color: #0f172a; line-height: 1.25;
+    margin-bottom: 16px;
+  }
+  .story-content p {
+    color: #64748b;
+    font-size: 0.92rem; line-height: 1.8;
+    margin-bottom: 14px;
+  }
+
+  /* Stats grid */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-top: 28px;
+  }
+  .stat-card {
+    background: #f8fafc;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 16px 12px;
+    text-align: center;
+    transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+  }
+  .stat-card:hover {
+    border-color: #0ea5e9;
+    box-shadow: 0 6px 20px rgba(14,165,233,0.12);
+    transform: translateY(-3px);
+  }
+  .stat-card .stat-num {
+    font-family: 'Sora', sans-serif;
+    font-size: 1.5rem; font-weight: 800;
+    color: #0ea5e9; line-height: 1;
+    margin-bottom: 5px;
+  }
+  .stat-card .stat-label {
+    font-size: 0.72rem; font-weight: 700;
+    color: #64748b; text-transform: uppercase; letter-spacing: 0.4px;
+  }
+
+  /* ── Values Section ── */
+  .values-section { margin-bottom: 80px; }
+  .values-header { text-align: center; margin-bottom: 36px; }
+  .values-header .tag {
+    display: inline-block;
+    background: #e0f2fe; color: #0284c7;
+    font-size: 0.72rem; font-weight: 800;
+    text-transform: uppercase; letter-spacing: 1px;
+    padding: 5px 12px; border-radius: 50px; margin-bottom: 12px;
+  }
+  .values-header h2 {
+    font-family: 'Sora', sans-serif;
+    font-size: clamp(1.35rem, 3vw, 1.75rem); font-weight: 700;
+    color: #0f172a;
+  }
+
+  .values-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .value-card {
+    background: white;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 20px;
+    padding: 28px 22px;
+    transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+  }
+  .value-card:hover {
+    border-color: #0ea5e9;
+    box-shadow: 0 8px 28px rgba(14,165,233,0.11);
+    transform: translateY(-4px);
+  }
+  .value-icon {
+    width: 48px; height: 48px;
+    background: linear-gradient(135deg, #e0f2fe, #bfdbfe);
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.4rem; margin-bottom: 16px;
+  }
+  .value-card h3 {
+    font-family: 'Sora', sans-serif;
+    font-size: 0.95rem; font-weight: 700;
+    color: #0f172a; margin-bottom: 8px;
+  }
+  .value-card p { color: #64748b; font-size: 0.845rem; line-height: 1.65; }
+
+  /* ── Testimonials ── */
+  .reviews-section { }
+  .reviews-header { text-align: center; margin-bottom: 36px; }
+  .reviews-header .tag {
+    display: inline-block;
+    background: #e0f2fe; color: #0284c7;
+    font-size: 0.72rem; font-weight: 800;
+    text-transform: uppercase; letter-spacing: 1px;
+    padding: 5px 12px; border-radius: 50px; margin-bottom: 12px;
+  }
+  .reviews-header h2 {
+    font-family: 'Sora', sans-serif;
+    font-size: clamp(1.35rem, 3vw, 1.75rem); font-weight: 700;
+    color: #0f172a;
+  }
+
+  .reviews-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+
+  .review-card {
+    background: white;
+    border-radius: 20px;
+    padding: 28px;
+    box-shadow: 0 4px 24px rgba(15,23,42,0.06);
+    border: 1.5px solid #e2e8f0;
+    transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+    display: flex; flex-direction: column; gap: 14px;
+  }
+  .review-card:hover {
+    border-color: #0ea5e9;
+    box-shadow: 0 10px 32px rgba(14,165,233,0.12);
+    transform: translateY(-4px);
+  }
+  .review-stars { color: #f59e0b; font-size: 0.9rem; letter-spacing: 2px; }
+  .review-text {
+    color: #64748b; font-size: 0.88rem;
+    line-height: 1.75; font-style: italic; flex: 1;
+  }
+  .review-text::before { content: '"'; font-size: 1.2rem; color: #0ea5e9; font-style: normal; font-weight: 800; }
+  .review-text::after  { content: '"'; font-size: 1.2rem; color: #0ea5e9; font-style: normal; font-weight: 800; }
+
+  .review-author { display: flex; align-items: center; gap: 12px; }
+  .review-avatar {
+    width: 42px; height: 42px; flex-shrink: 0;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #0ea5e9, #0369a1);
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-weight: 800; font-size: 1rem;
+    font-family: 'Sora', sans-serif;
+  }
+  .review-name { font-weight: 800; font-size: 0.9rem; color: #0f172a; }
+  .review-location { font-size: 0.76rem; color: #94a3b8; font-weight: 600; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 860px) {
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    .values-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  @media (max-width: 640px) {
+    .about-page { padding: 40px 1.25rem 60px; }
+    .story-grid { grid-template-columns: 1fr; gap: 28px; margin-bottom: 52px; }
+    .story-visual { padding: 40px 32px; font-size: 4rem; border-radius: 20px; }
+    .reviews-grid { grid-template-columns: 1fr; }
+    .values-grid { grid-template-columns: 1fr; }
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    .values-section, .reviews-section { margin-bottom: 52px; }
+  }
+
+  @media (max-width: 400px) {
+    .about-hero { padding: 52px 1rem 60px; }
+    .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .stat-card .stat-num { font-size: 1.3rem; }
+    .review-card { padding: 20px; }
+    .value-card { padding: 22px 18px; }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- Hero -->
+<div class="about-hero">
+  <div class="tag">🏢 Hamare Baare Mein</div>
+  <h1>Utkarsh Cleaning</h1>
+  <p>6 saal se aapke ghar ko chamka rahe hain — Lucknow se poore UP mein</p>
+</div>
+
+<div class="about-page">
+
+  <!-- Story Section -->
+  <div class="story-grid">
+    <div class="story-visual">
+      <div class="trophy">🏆</div>
+    </div>
+
+    <div class="story-content">
+      <div class="tag">Hamari Kahani</div>
+      <h2>Utkarsh Cleaning Ki Shuruat</h2>
+      <p>2018 mein Lucknow mein shuru hue, aaj hum Uttar Pradesh ke sabse bharosemand cleaning service providers mein se ek hain.</p>
+      <p>Hamara maqsad simple hai — aapke ghar ko itna saaf kar dein ki aap ek naye ghar mein rehne wali feeling paaiyein.</p>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-num">5000+</div>
+          <div class="stat-label">Happy Customers</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num">50+</div>
+          <div class="stat-label">Expert Cleaners</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num">6+</div>
+          <div class="stat-label">Years Experience</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num">4.9★</div>
+          <div class="stat-label">Average Rating</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Values Section -->
+  <div class="values-section">
+    <div class="values-header">
+      <div class="tag">💡 Hamare Usool</div>
+      <h2>Hum Kaise Kaam Karte Hain?</h2>
+    </div>
+    <div class="values-grid">
+      <div class="value-card">
+        <div class="value-icon">✅</div>
+        <h3>Verified Professionals</h3>
+        <p>Hamare saare cleaners background-checked aur trained hain. Aap trust ke saath darwaza khol sakte hain.</p>
+      </div>
+      <div class="value-card">
+        <div class="value-icon">🌿</div>
+        <h3>Eco-Friendly Products</h3>
+        <p>Hum sirf safe aur environment-friendly cleaning products use karte hain — aapke bachon aur pets ke liye bilkul safe.</p>
+      </div>
+      <div class="value-card">
+        <div class="value-icon">⏰</div>
+        <h3>Time Pe Service</h3>
+        <p>Aapka time hamara respect hai. Hum hamesha apne schedule ke anusaar aate hain — bina kisi delay ke.</p>
+      </div>
+      <div class="value-card">
+        <div class="value-icon">💰</div>
+        <h3>Fair Pricing</h3>
+        <p>Koi hidden charges nahi. Jo price quote hoti hai, wohi final hoti hai — transparent aur affordable.</p>
+      </div>
+      <div class="value-card">
+        <div class="value-icon">🔒</div>
+        <h3>100% Satisfaction</h3>
+        <p>Agar aap khush nahi toh hum dobara aaenge — bilkul free mein. Yeh hamara guarantee hai.</p>
+      </div>
+      <div class="value-card">
+        <div class="value-icon">📞</div>
+        <h3>24/7 Support</h3>
+        <p>Koi bhi problem ho, hum har waqt available hain. Ek call par hum hain aapke saath.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Testimonials -->
+  {% if testimonials %}
+  <div class="reviews-section">
+    <div class="reviews-header">
+      <div class="tag">⭐ Customer Reviews</div>
+      <h2>Log Kya Kehte Hain?</h2>
+    </div>
+    <div class="reviews-grid">
+      {% for t in testimonials %}
+      <div class="review-card">
+        <div class="review-stars">
+          {% for i in "12345" %}{% if forloop.counter <= t.rating %}⭐{% endif %}{% endfor %}
+        </div>
+        <div class="review-text">{{ t.comment }}</div>
+        <div class="review-author">
+          <div class="review-avatar">{{ t.name|first }}</div>
+          <div>
+            <div class="review-name">{{ t.name }}</div>
+            <div class="review-location">📍 {{ t.location }}</div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}

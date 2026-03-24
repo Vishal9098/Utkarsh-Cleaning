@@ -1,0 +1,455 @@
+{% extends 'cleaning_app/base.html' %}
+{% block title %}Checkout - Utkarsh Cleaning{% endblock %}
+{% block extra_css %}
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Sora:wght@400;600;700&display=swap');
+
+  /* ── Hero ── */
+  .checkout-hero {
+    background: linear-gradient(160deg, #0ea5e9 0%, #0369a1 55%, #075985 100%);
+    padding: 48px 2rem 56px;
+    position: relative; overflow: hidden;
+  }
+  .checkout-hero::before {
+    content: '';
+    position: absolute; width: 420px; height: 420px;
+    background: rgba(255,255,255,0.06); border-radius: 50%;
+    top: -160px; right: -80px; pointer-events: none;
+  }
+  .checkout-hero::after {
+    content: '';
+    position: absolute; width: 200px; height: 200px;
+    background: rgba(255,255,255,0.04); border-radius: 50%;
+    bottom: -60px; left: -40px; pointer-events: none;
+  }
+  .checkout-hero-inner { max-width: 1200px; margin: 0 auto; position: relative; z-index: 1; }
+  .checkout-hero .tag {
+    display: inline-block;
+    background: rgba(255,255,255,0.15); color: rgba(255,255,255,0.95);
+    font-size: 0.72rem; font-weight: 800;
+    text-transform: uppercase; letter-spacing: 1.2px;
+    padding: 5px 14px; border-radius: 50px;
+    margin-bottom: 12px; backdrop-filter: blur(6px);
+  }
+  .checkout-hero h1 {
+    font-family: 'Sora', sans-serif;
+    font-size: clamp(1.6rem, 4vw, 2.2rem); font-weight: 700;
+    color: white; line-height: 1.2; margin-bottom: 6px;
+  }
+  .checkout-hero p { color: rgba(255,255,255,0.7); font-size: 0.9rem; }
+
+  /* ── Layout ── */
+  .checkout-page {
+    max-width: 1200px; margin: 0 auto;
+    padding: 40px 2rem 80px;
+    display: grid; grid-template-columns: 1fr 380px;
+    gap: 32px; align-items: start;
+  }
+
+  /* ── Step Indicator ── */
+  .steps {
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 28px; flex-wrap: wrap; gap: 4px;
+  }
+  .step { display: flex; align-items: center; gap: 8px; font-size: 0.8rem; font-weight: 700; }
+  .step-num {
+    width: 28px; height: 28px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.75rem; font-weight: 800; flex-shrink: 0;
+  }
+  .step.done .step-num  { background: #10b981; color: white; }
+  .step.active .step-num { background: #0ea5e9; color: white; box-shadow: 0 0 0 4px rgba(14,165,233,0.2); }
+  .step.pending .step-num{ background: #e2e8f0; color: #94a3b8; }
+  .step.done   .step-label { color: #10b981; }
+  .step.active .step-label { color: #0ea5e9; }
+  .step.pending .step-label { color: #94a3b8; }
+  .step-connector { width: 36px; height: 2px; background: #e2e8f0; margin: 0 4px; flex-shrink: 0; }
+  .step-connector.done { background: #10b981; }
+
+  /* ── Form Cards ── */
+  .form-card {
+    background: white; border-radius: 24px;
+    padding: 28px 30px; border: 1.5px solid #e2e8f0;
+    box-shadow: 0 4px 24px rgba(14,165,233,0.06);
+    margin-bottom: 20px;
+  }
+  .form-card-title {
+    display: flex; align-items: center; gap: 12px;
+    font-family: 'Sora', sans-serif;
+    font-size: 1rem; font-weight: 700; color: #0f172a;
+    margin-bottom: 22px; padding-bottom: 16px;
+    border-bottom: 1.5px solid #f1f5f9;
+  }
+  .form-card-title .title-icon {
+    width: 36px; height: 36px;
+    background: linear-gradient(135deg, #e0f2fe, #bfdbfe);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.95rem; color: #0284c7; flex-shrink: 0;
+  }
+
+  /* ── Form Fields ── */
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .form-full  { grid-column: 1 / -1; }
+  .form-group { display: flex; flex-direction: column; }
+  .form-group label {
+    font-size: 0.74rem; font-weight: 800; color: #0f172a;
+    text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 7px;
+  }
+  .form-group .form-control,
+  .form-group input:not([type=radio]),
+  .form-group select,
+  .form-group textarea {
+    width: 100%; padding: 10px 14px;
+    border: 2px solid #e2e8f0; border-radius: 12px;
+    font-size: 0.9rem; font-family: 'Nunito', sans-serif;
+    color: #0f172a; background: #f8fafc;
+    transition: border-color 0.2s, background 0.2s, box-shadow 0.2s; outline: none;
+  }
+  .form-group .form-control:focus,
+  .form-group input:not([type=radio]):focus,
+  .form-group select:focus,
+  .form-group textarea:focus {
+    border-color: #0ea5e9; background: white;
+    box-shadow: 0 0 0 4px rgba(14,165,233,0.12);
+  }
+
+  /* ── Payment Options ── */
+  .payment-options { display: flex; flex-direction: column; gap: 10px; }
+  .payment-option {
+    display: flex; align-items: center; gap: 14px;
+    padding: 14px 16px; border: 2px solid #e2e8f0;
+    border-radius: 14px; cursor: pointer; transition: all 0.2s;
+  }
+  .payment-option:hover { border-color: #0ea5e9; background: #fafcff; }
+  .payment-option input[type="radio"] { display: none; }
+  .payment-option.selected {
+    border-color: #0ea5e9;
+    background: linear-gradient(135deg, rgba(14,165,233,0.05), rgba(14,165,233,0.02));
+  }
+  .p-emoji { font-size: 1.6rem; flex-shrink: 0; }
+  .p-info { flex: 1; }
+  .p-title { font-weight: 800; font-size: 0.9rem; color: #0f172a; }
+  .p-desc  { font-size: 0.78rem; color: #64748b; font-weight: 600; margin-top: 2px; }
+  .p-radio {
+    width: 20px; height: 20px; border: 2px solid #e2e8f0;
+    border-radius: 50%; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; transition: all 0.2s;
+  }
+  .payment-option.selected .p-radio { border-color: #0ea5e9; background: #0ea5e9; }
+  .payment-option.selected .p-radio::after {
+    content: ''; width: 7px; height: 7px;
+    background: white; border-radius: 50%; display: block;
+  }
+
+  /* ── Order Summary Sidebar ── */
+  .order-summary-box {
+    background: white; border-radius: 24px;
+    border: 1.5px solid #e2e8f0; padding: 28px;
+    box-shadow: 0 4px 24px rgba(14,165,233,0.07);
+    position: sticky; top: 88px;
+  }
+  .summary-header {
+    display: flex; align-items: center; gap: 10px;
+    font-family: 'Sora', sans-serif;
+    font-size: 1rem; font-weight: 700; color: #0f172a;
+    margin-bottom: 18px; padding-bottom: 16px;
+    border-bottom: 1.5px solid #f1f5f9;
+  }
+  .summary-header .s-icon {
+    width: 34px; height: 34px;
+    background: linear-gradient(135deg, #e0f2fe, #bfdbfe);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.95rem; flex-shrink: 0;
+  }
+
+  .order-item-row {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 0; border-bottom: 1px solid #f8fafc;
+  }
+  .order-item-row:last-of-type { border-bottom: none; }
+  .order-item-img {
+    width: 44px; height: 44px; flex-shrink: 0;
+    background: linear-gradient(135deg, #e0f2fe, #bfdbfe);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.3rem; overflow: hidden;
+  }
+  .order-item-img img { width: 100%; height: 100%; object-fit: cover; border-radius: 10px; }
+  .order-item-body { flex: 1; min-width: 0; }
+  .order-item-name  { font-weight: 700; font-size: 0.855rem; color: #0f172a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .order-item-qty   { font-size: 0.76rem; color: #94a3b8; font-weight: 600; margin-top: 2px; }
+  .order-item-price { font-weight: 800; color: #0ea5e9; font-size: 0.9rem; flex-shrink: 0; }
+
+  .s-divider { height: 1.5px; background: #f1f5f9; margin: 12px 0; }
+  .summary-row {
+    display: flex; justify-content: space-between;
+    font-size: 0.875rem; margin-bottom: 10px;
+  }
+  .summary-row span:first-child { color: #64748b; font-weight: 600; }
+  .summary-row span:last-child   { font-weight: 700; color: #0f172a; }
+  .summary-row.discount span:last-child { color: #10b981; }
+
+  .summary-total {
+    display: flex; justify-content: space-between; align-items: center;
+    padding-top: 14px; border-top: 1.5px solid #f1f5f9; margin-bottom: 20px;
+  }
+  .summary-total .t-label  { font-family: 'Sora', sans-serif; font-size: 1rem; font-weight: 700; color: #0f172a; }
+  .summary-total .t-amount { font-family: 'Sora', sans-serif; font-size: 1.5rem; font-weight: 900; color: #0ea5e9; }
+
+  .place-order-btn {
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    width: 100%; padding: 15px;
+    background: linear-gradient(135deg, #0ea5e9, #0284c7);
+    color: white; border: none; border-radius: 14px;
+    font-family: 'Sora', sans-serif;
+    font-size: 1rem; font-weight: 700; cursor: pointer; transition: all 0.2s;
+    box-shadow: 0 6px 20px rgba(14,165,233,0.35); letter-spacing: 0.3px;
+  }
+  .place-order-btn:hover  { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(14,165,233,0.45); }
+  .place-order-btn:active { transform: translateY(0); }
+
+  .secure-note {
+    display: flex; align-items: center; justify-content: center; gap: 7px;
+    margin-top: 14px; font-size: 0.78rem; font-weight: 700; color: #94a3b8;
+  }
+  .secure-note i { color: #10b981; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 1024px) {
+    .checkout-page { grid-template-columns: 1fr; }
+    .order-summary-box { position: static; }
+  }
+
+  @media (max-width: 640px) {
+    .checkout-page { padding: 24px 1rem 60px; gap: 20px; }
+    .checkout-hero { padding: 36px 1rem 44px; }
+    .form-card { padding: 20px 18px; border-radius: 18px; margin-bottom: 14px; }
+    .form-grid { grid-template-columns: 1fr; gap: 12px; }
+    .form-full { grid-column: 1; }
+    .order-summary-box { padding: 20px 18px; border-radius: 18px; }
+    .step-label { display: none; }
+    .step-connector { width: 20px; }
+  }
+
+  @media (max-width: 400px) {
+    .checkout-hero  { padding: 28px 0.75rem 36px; }
+    .checkout-page  { padding: 20px 0.75rem 48px; }
+    .form-card      { padding: 16px 14px; }
+    .order-summary-box { padding: 16px 14px; }
+    .place-order-btn { font-size: 0.95rem; padding: 13px; }
+    .summary-total .t-amount { font-size: 1.3rem; }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- Hero -->
+<div class="checkout-hero">
+  <div class="checkout-hero-inner">
+    <div class="tag">🔒 Secure Checkout</div>
+    <h1>Order Complete Karein</h1>
+    <p>Aapka order almost ready hai — bas details fill karein</p>
+  </div>
+</div>
+
+<form method="post">
+{% csrf_token %}
+<div class="checkout-page">
+
+  <!-- ── Left: Forms ── -->
+  <div>
+
+    <!-- Step Indicator -->
+    <div class="steps">
+      <div class="step done">
+        <div class="step-num"><i class="fas fa-check" style="font-size:0.65rem"></i></div>
+        <span class="step-label">Cart</span>
+      </div>
+      <div class="step-connector done"></div>
+      <div class="step active">
+        <div class="step-num">2</div>
+        <span class="step-label">Checkout</span>
+      </div>
+      <div class="step-connector"></div>
+      <div class="step pending">
+        <div class="step-num">3</div>
+        <span class="step-label">Confirm</span>
+      </div>
+    </div>
+
+    <!-- Personal Info -->
+    <div class="form-card">
+      <div class="form-card-title">
+        <div class="title-icon"><i class="fas fa-user"></i></div>
+        Personal Information
+      </div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Full Name *</label>
+          {{ form.customer_name }}
+        </div>
+        <div class="form-group">
+          <label>Phone Number *</label>
+          {{ form.customer_phone }}
+        </div>
+        <div class="form-group form-full">
+          <label>Email *</label>
+          {{ form.customer_email }}
+        </div>
+      </div>
+    </div>
+
+    <!-- Address -->
+    <div class="form-card">
+      <div class="form-card-title">
+        <div class="title-icon"><i class="fas fa-map-marker-alt"></i></div>
+        Service Address
+      </div>
+      <div class="form-grid">
+        <div class="form-group form-full">
+          <label>Address Line 1 *</label>
+          {{ form.address_line1 }}
+        </div>
+        <div class="form-group form-full">
+          <label>Address Line 2</label>
+          {{ form.address_line2 }}
+        </div>
+        <div class="form-group">
+          <label>City *</label>
+          {{ form.city }}
+        </div>
+        <div class="form-group">
+          <label>State</label>
+          {{ form.state }}
+        </div>
+        <div class="form-group">
+          <label>Pincode *</label>
+          {{ form.pincode }}
+        </div>
+      </div>
+    </div>
+
+    <!-- Schedule -->
+    <div class="form-card">
+      <div class="form-card-title">
+        <div class="title-icon"><i class="fas fa-calendar-alt"></i></div>
+        Service Schedule
+      </div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Service Date *</label>
+          {{ form.service_date }}
+        </div>
+        <div class="form-group">
+          <label>Service Time *</label>
+          {{ form.service_time }}
+        </div>
+        <div class="form-group form-full">
+          <label>Special Instructions</label>
+          {{ form.special_instructions }}
+        </div>
+      </div>
+    </div>
+
+    <!-- Payment -->
+    <div class="form-card">
+      <div class="form-card-title">
+        <div class="title-icon"><i class="fas fa-credit-card"></i></div>
+        Payment Method
+      </div>
+      <div class="payment-options">
+
+        <label class="payment-option selected" onclick="selectPayment(this)">
+          <input type="radio" name="payment_method" value="cod" checked>
+          <div class="p-emoji">💵</div>
+          <div class="p-info">
+            <div class="p-title">Cash on Delivery</div>
+            <div class="p-desc">Service ke baad payment karein</div>
+          </div>
+          <div class="p-radio"></div>
+        </label>
+
+        <label class="payment-option" onclick="selectPayment(this)">
+          <input type="radio" name="payment_method" value="upi">
+          <div class="p-emoji">📱</div>
+          <div class="p-info">
+            <div class="p-title">UPI Payment</div>
+            <div class="p-desc">PhonePe, GPay, Paytm</div>
+          </div>
+          <div class="p-radio"></div>
+        </label>
+
+        <label class="payment-option" onclick="selectPayment(this)">
+          <input type="radio" name="payment_method" value="online">
+          <div class="p-emoji">💳</div>
+          <div class="p-info">
+            <div class="p-title">Credit / Debit Card</div>
+            <div class="p-desc">Secure online payment</div>
+          </div>
+          <div class="p-radio"></div>
+        </label>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── Right: Order Summary ── -->
+  <div class="order-summary-box">
+    <div class="summary-header">
+      <div class="s-icon">📋</div>
+      Order Summary
+    </div>
+
+    {% for item in cart_items %}
+    <div class="order-item-row">
+      <div class="order-item-img">
+        {% if item.service.image %}
+        <img src="{{ item.service.image.url }}" alt="{{ item.service.name }}">
+        {% else %}🧹{% endif %}
+      </div>
+      <div class="order-item-body">
+        <div class="order-item-name">{{ item.service.name }}</div>
+        <div class="order-item-qty">× {{ item.quantity }}</div>
+      </div>
+      <div class="order-item-price">₹{{ item.get_subtotal }}</div>
+    </div>
+    {% endfor %}
+
+    <div class="s-divider"></div>
+    <div class="summary-row"><span>Subtotal</span><span>₹{{ subtotal }}</span></div>
+    <div class="summary-row"><span>GST (18%)</span><span>₹{{ tax }}</span></div>
+    {% if discount > 0 %}
+    <div class="summary-row discount"><span>Discount</span><span>−₹{{ discount|floatformat:"0" }}</span></div>
+    {% endif %}
+    <div class="summary-total">
+      <span class="t-label">Total</span>
+      <span class="t-amount">₹{{ total }}</span>
+    </div>
+
+    <button type="submit" class="place-order-btn">
+      <i class="fas fa-check-circle"></i> Order Place Karein
+    </button>
+
+    <div class="secure-note">
+      <i class="fas fa-shield-alt"></i>
+      100% Secure &amp; Encrypted
+    </div>
+  </div>
+
+</div>
+</form>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  function selectPayment(el) {
+    document.querySelectorAll('.payment-option').forEach(o => o.classList.remove('selected'));
+    el.classList.add('selected');
+    el.querySelector('input[type="radio"]').checked = true;
+  }
+</script>
+{% endblock %}

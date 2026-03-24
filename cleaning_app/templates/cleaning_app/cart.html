@@ -1,0 +1,492 @@
+{% extends 'cleaning_app/base.html' %}
+{% block title %}Cart - Utkarsh Cleaning{% endblock %}
+{% block extra_css %}
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Sora:wght@400;600;700&display=swap');
+
+  /* ── Page Header ── */
+  .cart-hero {
+    background: linear-gradient(160deg, #0ea5e9 0%, #0369a1 55%, #075985 100%);
+    padding: 48px 2rem 56px;
+    position: relative; overflow: hidden;
+  }
+  .cart-hero::before {
+    content: '';
+    position: absolute;
+    width: 400px; height: 400px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 50%;
+    top: -150px; right: -80px;
+    pointer-events: none;
+  }
+  .cart-hero::after {
+    content: '';
+    position: absolute;
+    width: 220px; height: 220px;
+    background: rgba(255,255,255,0.04);
+    border-radius: 50%;
+    bottom: -60px; left: -40px;
+    pointer-events: none;
+  }
+  .cart-hero-inner {
+    max-width: 1200px; margin: 0 auto;
+    position: relative; z-index: 1;
+  }
+  .cart-hero .tag {
+    display: inline-block;
+    background: rgba(255,255,255,0.15);
+    color: rgba(255,255,255,0.95);
+    font-size: 0.72rem; font-weight: 800;
+    text-transform: uppercase; letter-spacing: 1.2px;
+    padding: 5px 14px; border-radius: 50px;
+    margin-bottom: 12px;
+    backdrop-filter: blur(6px);
+  }
+  .cart-hero h1 {
+    font-family: 'Sora', sans-serif;
+    font-size: clamp(1.6rem, 4vw, 2.2rem); font-weight: 700;
+    color: white; line-height: 1.2; margin-bottom: 6px;
+  }
+  .cart-hero p { color: rgba(255,255,255,0.7); font-size: 0.9rem; }
+
+  /* ── Layout ── */
+  .cart-page {
+    max-width: 1200px; margin: 0 auto;
+    padding: 40px 2rem 80px;
+    display: grid;
+    grid-template-columns: 1fr 360px;
+    gap: 32px;
+    align-items: start;
+  }
+
+  /* ── Cart Table ── */
+  .cart-table {
+    background: white;
+    border-radius: 24px;
+    border: 1.5px solid #e2e8f0;
+    overflow: hidden;
+    box-shadow: 0 4px 24px rgba(14,165,233,0.07);
+  }
+  .cart-table-header {
+    background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+    padding: 16px 24px;
+    border-bottom: 1.5px solid #e2e8f0;
+    display: grid;
+    grid-template-columns: 2.2fr 1fr 1.2fr 1fr 40px;
+    gap: 12px;
+    font-size: 0.72rem; font-weight: 800;
+    color: #64748b;
+    text-transform: uppercase; letter-spacing: 0.7px;
+  }
+
+  .cart-item {
+    padding: 20px 24px;
+    border-bottom: 1px solid #f1f5f9;
+    display: grid;
+    grid-template-columns: 2.2fr 1fr 1.2fr 1fr 40px;
+    gap: 12px;
+    align-items: center;
+    transition: background 0.15s;
+  }
+  .cart-item:last-child { border-bottom: none; }
+  .cart-item:hover { background: #fafcff; }
+
+  .item-info { display: flex; align-items: center; gap: 14px; min-width: 0; }
+  .item-icon {
+    width: 52px; height: 52px; flex-shrink: 0;
+    background: linear-gradient(135deg, #e0f2fe, #bfdbfe);
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.6rem;
+    overflow: hidden;
+  }
+  .item-icon img { width: 100%; height: 100%; object-fit: cover; border-radius: 14px; }
+  .item-name {
+    font-family: 'Sora', sans-serif;
+    font-weight: 700; font-size: 0.92rem;
+    color: #0f172a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .item-category { color: #64748b; font-size: 0.78rem; font-weight: 600; margin-top: 2px; }
+  .item-duration { font-size: 0.75rem; color: #94a3b8; font-weight: 600; margin-top: 2px; }
+
+  .item-price { font-weight: 800; color: #0ea5e9; font-size: 0.98rem; }
+
+  .qty-control { display: flex; align-items: center; gap: 6px; }
+  .qty-btn {
+    width: 30px; height: 30px;
+    border: 2px solid #e2e8f0; border-radius: 8px;
+    background: white; cursor: pointer; font-size: 1rem;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s; font-weight: 700; color: #64748b;
+    flex-shrink: 0;
+  }
+  .qty-btn:hover { border-color: #0ea5e9; color: #0ea5e9; background: #e0f2fe; }
+  .qty-input {
+    width: 40px; text-align: center;
+    border: 2px solid #e2e8f0; border-radius: 8px;
+    padding: 5px 4px; font-size: 0.88rem;
+    font-family: 'Nunito', sans-serif; font-weight: 800;
+    color: #0f172a; background: #f8fafc;
+  }
+
+  .item-subtotal { font-weight: 900; font-size: 1rem; color: #0f172a; }
+
+  .remove-btn {
+    width: 34px; height: 34px;
+    background: none; border: none; cursor: pointer;
+    color: #cbd5e1; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s; font-size: 0.9rem;
+  }
+  .remove-btn:hover { background: #fee2e2; color: #ef4444; }
+
+  /* Cart Footer */
+  .cart-footer {
+    margin-top: 16px;
+    display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  }
+
+  /* ── Order Summary ── */
+  .order-summary {
+    background: white;
+    border-radius: 24px;
+    border: 1.5px solid #e2e8f0;
+    padding: 28px;
+    box-shadow: 0 4px 24px rgba(14,165,233,0.07);
+    position: sticky; top: 88px;
+  }
+  .summary-title {
+    display: flex; align-items: center; gap: 10px;
+    font-family: 'Sora', sans-serif;
+    font-size: 1.05rem; font-weight: 700;
+    color: #0f172a; margin-bottom: 22px;
+    padding-bottom: 16px;
+    border-bottom: 1.5px solid #f1f5f9;
+  }
+  .summary-title .icon {
+    width: 36px; height: 36px;
+    background: linear-gradient(135deg, #e0f2fe, #bfdbfe);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1rem;
+  }
+
+  .summary-row {
+    display: flex; justify-content: space-between;
+    margin-bottom: 12px; font-size: 0.88rem;
+  }
+  .summary-row span:first-child { color: #64748b; font-weight: 600; }
+  .summary-row span:last-child { font-weight: 700; color: #0f172a; }
+  .summary-row.discount span:last-child { color: #10b981; }
+
+  .summary-divider { height: 1.5px; background: #f1f5f9; margin: 14px 0; }
+
+  .summary-total {
+    display: flex; justify-content: space-between;
+    align-items: center; margin-bottom: 20px;
+  }
+  .summary-total .label {
+    font-family: 'Sora', sans-serif;
+    font-size: 1rem; font-weight: 700; color: #0f172a;
+  }
+  .summary-total .amount {
+    font-family: 'Sora', sans-serif;
+    font-size: 1.5rem; font-weight: 800; color: #0ea5e9;
+  }
+
+  /* Coupon */
+  .coupon-section { margin-bottom: 16px; }
+  .coupon-label {
+    font-size: 0.75rem; font-weight: 800;
+    text-transform: uppercase; letter-spacing: 0.6px;
+    color: #0f172a; margin-bottom: 8px; display: block;
+  }
+  .coupon-form { display: flex; gap: 8px; }
+  .coupon-form input {
+    flex: 1; padding: 10px 14px;
+    border: 2px solid #e2e8f0; border-radius: 11px;
+    font-family: 'Nunito', sans-serif; font-size: 0.875rem;
+    outline: none; transition: border-color 0.2s, box-shadow 0.2s;
+    color: #0f172a; background: #f8fafc;
+  }
+  .coupon-form input:focus {
+    border-color: #0ea5e9; background: white;
+    box-shadow: 0 0 0 4px rgba(14,165,233,0.12);
+  }
+  .coupon-form input::placeholder { color: #94a3b8; }
+  .coupon-form .apply-btn {
+    padding: 10px 16px;
+    background: #f1f5f9; border: 2px solid #e2e8f0;
+    border-radius: 11px; font-family: 'Nunito', sans-serif;
+    font-size: 0.82rem; font-weight: 800; color: #64748b;
+    cursor: pointer; transition: all 0.2s; white-space: nowrap;
+  }
+  .coupon-form .apply-btn:hover {
+    background: #0ea5e9; border-color: #0ea5e9; color: white;
+  }
+
+  /* Checkout button */
+  .checkout-btn {
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    width: 100%; padding: 15px;
+    background: linear-gradient(135deg, #0ea5e9, #0284c7);
+    color: white; border: none; border-radius: 14px;
+    font-family: 'Sora', sans-serif;
+    font-size: 1rem; font-weight: 700;
+    cursor: pointer; transition: all 0.2s;
+    box-shadow: 0 6px 20px rgba(14,165,233,0.35);
+    text-decoration: none; letter-spacing: 0.3px;
+  }
+  .checkout-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(14,165,233,0.45); }
+  .checkout-btn:active { transform: translateY(0); }
+
+  .secure-badges {
+    display: flex; align-items: center; justify-content: center; gap: 16px;
+    margin-top: 14px; flex-wrap: wrap;
+  }
+  .badge-item {
+    display: flex; align-items: center; gap: 5px;
+    font-size: 0.76rem; font-weight: 700; color: #64748b;
+  }
+  .badge-item i { color: #10b981; font-size: 0.8rem; }
+
+  /* ── Empty Cart ── */
+  .empty-cart {
+    grid-column: 1 / -1;
+    text-align: center; padding: 80px 2rem;
+    display: flex; flex-direction: column; align-items: center;
+  }
+  .empty-cart-icon {
+    width: 100px; height: 100px;
+    background: linear-gradient(135deg, #e0f2fe, #bfdbfe);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 2.8rem; margin-bottom: 24px;
+  }
+  .empty-cart h2 {
+    font-family: 'Sora', sans-serif;
+    font-size: 1.5rem; font-weight: 700;
+    color: #0f172a; margin-bottom: 10px;
+  }
+  .empty-cart p { color: #64748b; font-size: 0.92rem; margin-bottom: 28px; }
+
+  /* ── Mobile Cart Cards ── */
+  .cart-item-mobile {
+    display: none;
+    padding: 18px 20px;
+    border-bottom: 1px solid #f1f5f9;
+    gap: 14px;
+  }
+  .cart-item-mobile:last-of-type { border-bottom: none; }
+  .mobile-item-top { display: flex; gap: 14px; align-items: flex-start; }
+  .mobile-item-body { flex: 1; min-width: 0; }
+  .mobile-item-bottom {
+    display: flex; align-items: center;
+    justify-content: space-between; margin-top: 12px;
+    flex-wrap: wrap; gap: 10px;
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 1024px) {
+    .cart-page { grid-template-columns: 1fr; }
+    .order-summary { position: static; }
+  }
+
+  @media (max-width: 700px) {
+    .cart-page { padding: 24px 1rem 60px; gap: 20px; }
+    .cart-hero { padding: 36px 1rem 44px; }
+
+    /* Hide desktop table rows, show mobile cards */
+    .cart-table-header { display: none; }
+    .cart-item { display: none; }
+    .cart-item-mobile { display: flex; flex-direction: column; }
+
+    .order-summary { padding: 22px 18px; }
+    .cart-footer { flex-direction: column; align-items: flex-start; }
+    .cart-footer .btn-outline { width: 100%; text-align: center; justify-content: center; }
+  }
+
+  @media (max-width: 400px) {
+    .cart-page { padding: 20px 0.75rem 48px; }
+    .cart-table { border-radius: 18px; }
+    .order-summary { border-radius: 18px; padding: 18px 16px; }
+    .summary-total .amount { font-size: 1.3rem; }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- Hero -->
+<div class="cart-hero">
+  <div class="cart-hero-inner">
+    <div class="tag">🛒 My Cart</div>
+    <h1>Mera Cart</h1>
+    <p>
+      {% if cart_items %}
+        {{ cart_items|length }} service{{ cart_items|length|pluralize }} aapki cart mein hain
+      {% else %}
+        Cart abhi khaali hai
+      {% endif %}
+    </p>
+  </div>
+</div>
+
+{% if cart_items %}
+<div class="cart-page">
+
+  <!-- Left: Cart Items -->
+  <div>
+    <div class="cart-table">
+
+      <!-- Desktop Header -->
+      <div class="cart-table-header">
+        <span>Service</span>
+        <span>Price</span>
+        <span>Quantity</span>
+        <span>Subtotal</span>
+        <span></span>
+      </div>
+
+      {% for item in cart_items %}
+
+      <!-- Desktop Row -->
+      <div class="cart-item">
+        <div class="item-info">
+          <div class="item-icon">
+            {% if item.service.image %}<img src="{{ item.service.image.url }}" alt="{{ item.service.name }}">{% else %}🧹{% endif %}
+          </div>
+          <div style="min-width:0">
+            <div class="item-name">{{ item.service.name }}</div>
+            <div class="item-category">{{ item.service.category.name }}</div>
+            <div class="item-duration">⏱ {{ item.service.get_duration_display }}</div>
+          </div>
+        </div>
+
+        <div class="item-price">₹{{ item.service.get_final_price }}</div>
+
+        <div>
+          <form method="post" action="{% url 'update_cart' item.id %}" class="qty-control">
+            {% csrf_token %}
+            <button type="submit" name="quantity" value="{{ item.quantity|add:'-1' }}" class="qty-btn">−</button>
+            <input type="text" class="qty-input" value="{{ item.quantity }}" readonly>
+            <button type="submit" name="quantity" value="{{ item.quantity|add:'1' }}" class="qty-btn">+</button>
+          </form>
+        </div>
+
+        <div class="item-subtotal">₹{{ item.get_subtotal }}</div>
+
+        <form method="post" action="{% url 'remove_from_cart' item.id %}">
+          {% csrf_token %}
+          <button type="submit" class="remove-btn" title="Remove"><i class="fas fa-trash-alt"></i></button>
+        </form>
+      </div>
+
+      <!-- Mobile Card -->
+      <div class="cart-item-mobile">
+        <div class="mobile-item-top">
+          <div class="item-icon">
+            {% if item.service.image %}<img src="{{ item.service.image.url }}" alt="{{ item.service.name }}">{% else %}🧹{% endif %}
+          </div>
+          <div class="mobile-item-body">
+            <div class="item-name">{{ item.service.name }}</div>
+            <div class="item-category">{{ item.service.category.name }}</div>
+            <div class="item-duration">⏱ {{ item.service.get_duration_display }}</div>
+          </div>
+          <form method="post" action="{% url 'remove_from_cart' item.id %}">
+            {% csrf_token %}
+            <button type="submit" class="remove-btn" title="Remove"><i class="fas fa-trash-alt"></i></button>
+          </form>
+        </div>
+        <div class="mobile-item-bottom">
+          <form method="post" action="{% url 'update_cart' item.id %}" class="qty-control">
+            {% csrf_token %}
+            <button type="submit" name="quantity" value="{{ item.quantity|add:'-1' }}" class="qty-btn">−</button>
+            <input type="text" class="qty-input" value="{{ item.quantity }}" readonly>
+            <button type="submit" name="quantity" value="{{ item.quantity|add:'1' }}" class="qty-btn">+</button>
+          </form>
+          <div style="text-align:right">
+            <div style="font-size:0.78rem;color:#64748b;font-weight:600;margin-bottom:2px;">₹{{ item.service.get_final_price }} × {{ item.quantity }}</div>
+            <div class="item-subtotal">₹{{ item.get_subtotal }}</div>
+          </div>
+        </div>
+      </div>
+
+      {% endfor %}
+    </div>
+
+    <div class="cart-footer">
+      <a href="{% url 'services' %}" class="btn-outline" style="display:inline-flex;align-items:center;gap:8px;">
+        <i class="fas fa-arrow-left" style="font-size:0.75rem"></i> Shopping Continue Karein
+      </a>
+    </div>
+  </div>
+
+  <!-- Right: Order Summary -->
+  <div class="order-summary">
+    <div class="summary-title">
+      <div class="icon">📋</div>
+      Order Summary
+    </div>
+
+    <div class="summary-row">
+      <span>Subtotal</span>
+      <span>₹{{ cart.get_total }}</span>
+    </div>
+    <div class="summary-row">
+      <span>GST (18%)</span>
+      <span>₹{{ cart.get_gst }}</span>
+    </div>
+    {% if cart.discount %}
+    <div class="summary-row discount">
+      <span>Discount</span>
+      <span>−₹{{ cart.discount }}</span>
+    </div>
+    {% endif %}
+
+    <div class="summary-divider"></div>
+
+    <div class="summary-total">
+      <span class="label">Total</span>
+      <span class="amount">₹{{ cart.get_total }}</span>
+    </div>
+
+    <!-- Coupon -->
+    <div class="coupon-section">
+      <span class="coupon-label">🎟 Coupon Code</span>
+      <form method="post" action="{% url 'apply_coupon' %}" class="coupon-form">
+        {% csrf_token %}
+        <input type="text" name="coupon_code" placeholder="Code daalein...">
+        <button type="submit" class="apply-btn">Apply</button>
+      </form>
+    </div>
+
+    <a href="{% url 'checkout' %}" class="checkout-btn">
+      <i class="fas fa-lock"></i> Secure Checkout
+    </a>
+
+    <div class="secure-badges">
+      <div class="badge-item"><i class="fas fa-shield-alt"></i> Secure</div>
+      <div class="badge-item"><i class="fas fa-lock"></i> Encrypted</div>
+      <div class="badge-item"><i class="fas fa-undo"></i> Easy Refund</div>
+    </div>
+  </div>
+
+</div>
+
+{% else %}
+
+<!-- Empty Cart -->
+<div class="cart-page">
+  <div class="empty-cart">
+    <div class="empty-cart-icon">🛒</div>
+    <h2>Cart Khaali Hai!</h2>
+    <p>Koi service add karein aur ghar ki safai karwaein</p>
+    <a href="{% url 'services' %}" class="btn-primary" style="font-size:1rem;padding:14px 32px;">
+      <i class="fas fa-broom"></i> Services Dekhein
+    </a>
+  </div>
+</div>
+
+{% endif %}
+{% endblock %}
